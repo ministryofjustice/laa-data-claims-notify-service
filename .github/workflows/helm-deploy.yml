@@ -9,6 +9,10 @@ on:
       deployment_name:
         required: true
         type: string
+      claim_api_environment_name:
+        required: true
+        type: string
+        description: The name of the environment which Claims API is deployed to
       image_tag:
         required: true
         type: string
@@ -24,6 +28,16 @@ jobs:
 
       - name: Set branch name
         run: echo "GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" >> $GITHUB_ENV
+
+      - name: Can I deploy?
+        id: can-i-deploy
+        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/pact-can-i-deploy@bb0edfbe7891e147b51b832714baa60048440f31 # v2
+        with:
+          pacticipant: 'laa-submit-a-bulk-claim'
+          environment: ${{ inputs.claim_api_environment_name }}
+          pact_broker_url: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
+          pact_broker_username: ${{ secrets.pact_broker_username }}
+          pact_broker_password: ${{ secrets.pact_broker_password }}
 
       - name: Authenticate to the cluster
         uses: ministryofjustice/laa-reusable-github-actions/.github/actions/authenticate_to_cluster@7666443ea3f635ec52544311e0f0ea51830468c0
@@ -97,3 +111,13 @@ jobs:
           role_to_assume: ${{ secrets.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME }}
           aws_region: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REGION }}
           ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}
+
+      - name: Record deployment to pact broker
+        id: record-deployment-to-pact-broker
+        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/pact-record-deployment@bb0edfbe7891e147b51b832714baa60048440f31 # v2
+        with:
+          pacticipant: 'laa-submit-a-bulk-claim'
+          environment: ${{ inputs.claim_api_environment_name }}
+          pact_broker_url: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
+          pact_broker_username: ${{ secrets.pact_broker_username }}
+          pact_broker_password: ${{ secrets.pact_broker_password }}

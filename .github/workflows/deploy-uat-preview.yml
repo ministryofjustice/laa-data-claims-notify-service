@@ -41,6 +41,26 @@ jobs:
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
+  pact-test:
+    needs: [ define-preview-version ]
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/pact-and-publish.yml@v2
+    permissions:
+      contents: write
+      packages: write
+    with:
+      pacticipant_name: "laa-data-claims-notify-service"
+      pact_test_task: "pactTest"
+      publish_pact_results: true
+      enable_can_i_merge: true
+      provider_name: "laa-data-claims-api"
+      pact_tags: "feature"
+      java_version: 25
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
+      pact_broker_url: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
+      pact_broker_username: ${{ secrets.PACT_BROKER_USERNAME }}
+      pact_broker_password: ${{ secrets.PACT_BROKER_PASSWORD }}
+
   ecr-publish-image:
     needs: [ build-and-test ]
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2
@@ -60,9 +80,9 @@ jobs:
       snyk_token: ${{ secrets.SNYK_TOKEN }}
 
 
-
   deploy-uat-preview:
     needs:
+      - pact-test
       - ecr-publish-image
     runs-on: ubuntu-latest
     environment: uat
