@@ -11,6 +11,14 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
+/**
+ * Configuration for AWS SQS client. The main goal of this configuration is to ensure that the
+ * application still works when running in a local environment without trying to autoload
+ * configuration for a localstack instance. Uses autoconfiguration to create the SQS client for
+ * non-local environments.
+ *
+ * @author Jamie Briggs
+ */
 @Configuration
 public class SqsConfig {
 
@@ -49,7 +57,7 @@ public class SqsConfig {
    *     credentials provider
    */
   @Bean
-  @Profile("!test & !wiremock")
+  @Profile("!local")
   public SqsClient sqsClient(@Value("${spring.cloud.aws.region.static}") String region) {
     return SqsClient.builder()
         .region(Region.of(region))

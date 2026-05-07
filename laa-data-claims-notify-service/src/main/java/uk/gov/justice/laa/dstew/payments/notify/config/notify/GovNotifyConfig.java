@@ -4,6 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.service.notify.NotificationClient;
 
+/**
+ * Configuration class for setting up the GOV.UK Notify client.
+ *
+ * @author Jamie Briggs
+ */
 @Configuration
 public class GovNotifyConfig {
 
