@@ -1,9 +1,9 @@
-#server:
-  #port: 8083
+server:
+  port: -1 # Disables the main HTTP server
 
 spring:
   main:
-    web-application-type:  none # Disable web application access
+    web-application-type:  servlet # Disable web application access
   application:
     name: laa-data-claims-notify-service
     version: @version@
@@ -15,7 +15,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, metrics, prometheus
 
 sentry:
   dsn: # configure dsn url here

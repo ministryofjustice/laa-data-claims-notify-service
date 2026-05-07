@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Entry point for the Spring Boot microservice application.
  */
 @SpringBootApplication
-public class SpringBootMicroserviceApplication {
+public class LaaDataClaimsNotifyServiceApplication {
 
   /**
    * The application main method.
@@ -15,6 +15,6 @@ public class SpringBootMicroserviceApplication {
    * @param args the application arguments.
    */
   public static void main(String[] args) {
-    SpringApplication.run(SpringBootMicroserviceApplication.class, args);
+    SpringApplication.run(LaaDataClaimsNotifyServiceApplication.class, args);
   }
 }
