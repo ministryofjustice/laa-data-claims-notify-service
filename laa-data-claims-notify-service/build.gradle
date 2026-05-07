@@ -49,6 +49,9 @@ dependencies {
     //implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
+    // GOV Notify
+    implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
+
     // Required for tracing information
     implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'

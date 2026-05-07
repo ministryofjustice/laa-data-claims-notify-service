@@ -28,6 +28,11 @@ app:
     access-token: ${CLAIMS_API_ACCESS_TOKEN:f67f968e-b479-4e61-b66e-f57984931e56}
   sqs:
     notify-queue-name: ${SQS_NOTIFY_QUEUE_NAME:notify-queue}
+  gov-notify:
+    key: ${NOTIFY_API_KEY:123}
+    templates:
+      example-email: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000000}
+      example-email-two: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000001}
 
 sentry:
   dsn: # configure dsn url here
