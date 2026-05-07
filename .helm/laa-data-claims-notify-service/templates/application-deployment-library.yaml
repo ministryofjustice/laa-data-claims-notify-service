@@ -1,0 +1,244 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-{{ .Chart.Name }}
+    appVersion: {{ .Chart.AppVersion }}
+spec:
+  replicas: {{ .Values.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-{{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Chart.Name }}-pod
+        app.kubernetes.io/name: {{ .Release.Name }}-{{ .Chart.Name }}
+    spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- else }}
+      serviceAccountName: {{ .Release.Namespace }}-service-account
+      {{- end }}
+      {{- if .Values.securityContext }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        runAsNonRoot: true
+      {{- end }}
+      {{- if .Values.volumes }}
+      volumes:
+        {{- tpl (toYaml .Values.volumes) $ | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Release.Name }}-{{ .Chart.Name }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          {{ if .Values.image }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          {{ else }}
+          image: {{ .Values.global.image.repository }}:{{ .Chart.AppVersion }}
+          {{- end }}
+          {{- if .Values.volumeMounts }}
+          volumeMounts:
+            {{- tpl (toYaml .Values.volumeMounts) $ | nindent 12 }}
+          {{- end }}
+          imagePullPolicy: IfNotPresent
+          {{ if .Values.command }}
+          command: [ '{{ .Values.command }}' ]
+          {{- end }}
+          {{- if .Values.resources }}
+          resources:
+            {{- if .Values.resources.limits }}
+            limits:
+              {{- if .Values.resources.limits.memory }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- end }}
+              {{- if .Values.resources.limits.cpu }}
+              cpu: {{ .Values.resources.limits.cpu }}
+              {{- end }}
+            {{- end }}
+            {{- if .Values.resources.requests }}
+            requests:
+              {{- if .Values.resources.requests.memory }}
+              memory: {{ .Values.resources.requests.memory }}
+              {{- end }}
+              {{- if .Values.resources.requests.cpu }}
+              cpu: {{ .Values.resources.requests.cpu }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            {{ if .Values.ports }}
+            - containerPort: {{ .Values.ports.targetPort }}
+            {{ else }}
+            - containerPort: {{ .Values.global.ports.targetPort }}
+            {{- end }}
+          {{ if .Values.probe.enabled }}
+          livenessProbe:
+            httpGet:
+              {{- if (((.Values.probe).liveness).endpoint) }}
+              path: {{ .Values.probe.liveness.endpoint }}
+              {{- else }}
+              path: "/actuator/health/liveness"
+              {{- end }}
+              {{- if ((.Values.management).port) }}
+              port: {{ .Values.management.port }}
+              {{- else }}
+              port: {{ .Values.global.management.port }}
+              {{- end }}
+            {{- if (((.Values.probe).liveness).timeoutSeconds) }}
+            timeoutSeconds: {{ .Values.probe.liveness.timeoutSeconds }}
+            {{- else }}
+            timeoutSeconds: 1
+            {{- end }}
+            {{- if (((.Values.probe).liveness).failureThreshold) }}
+            failureThreshold: {{ .Values.probe.liveness.failureThreshold }}
+            {{- else }}
+            failureThreshold: 4
+            {{- end }}
+            {{- if (((.Values.probe).liveness).successThreshold) }}
+            successThreshold: {{ .Values.probe.liveness.successThreshold }}
+            {{- else }}
+            successThreshold: 1
+            {{- end }}
+            {{- if (((.Values.probe).liveness).periodSeconds) }}
+            periodSeconds: {{ .Values.probe.liveness.periodSeconds }}
+            {{- else }}
+            periodSeconds: 10
+            {{- end }}
+            {{- if (((.Values.probe).liveness).initialDelaySeconds) }}
+            initialDelaySeconds: {{ .Values.probe.liveness.initialDelaySeconds }}
+            {{- else }}
+            initialDelaySeconds: 10
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              {{- if (((.Values.probe).readiness).endpoint) }}
+              path: {{ .Values.probe.readiness.endpoint }}
+              {{- else }}
+              path: "/actuator/health/readiness"
+              {{- end }}
+              {{- if ((.Values.management).port) }}
+              port: {{ .Values.management.port }}
+              {{- else }}
+              port: {{ .Values.global.management.port }}
+              {{- end }}
+            {{- if (((.Values.probe).readiness).timeoutSeconds) }}
+            timeoutSeconds: {{ .Values.probe.readiness.timeoutSeconds }}
+            {{- else }}
+            timeoutSeconds: 1
+            {{- end }}
+            {{- if (((.Values.probe).readiness).failureThreshold) }}
+            failureThreshold: {{ .Values.probe.readiness.failureThreshold }}
+            {{- else }}
+            failureThreshold: 2
+            {{- end }}
+            {{- if (((.Values.probe).readiness).successThreshold) }}
+            successThreshold: {{ .Values.probe.readiness.successThreshold }}
+            {{- else }}
+            successThreshold: 1
+            {{- end }}
+            {{- if (((.Values.probe).readiness).periodSeconds) }}
+            periodSeconds: {{ .Values.probe.readiness.periodSeconds }}
+            {{- else }}
+            periodSeconds: 5
+            {{- end }}
+            {{- if (((.Values.probe).readiness).initialDelaySeconds) }}
+            initialDelaySeconds: {{ .Values.probe.readiness.initialDelaySeconds }}
+            {{- else }}
+            initialDelaySeconds: 10
+            {{- end }}
+          {{- end }}
+          env:
+          {{ if .Values.env }}
+          {{- range .Values.env }}
+            - name: {{ .name }}
+            {{- if .value }}
+              value: {{ tpl .value $ | quote }}
+            {{- end }}
+            {{- if .valueFrom }}
+              valueFrom:
+              {{- if .valueFrom.secretKeyRef }}
+                secretKeyRef:
+                  name: {{ tpl .valueFrom.secretKeyRef.name $ | quote }}
+                  key: {{ .valueFrom.secretKeyRef.key }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+          {{ if .Values.extraEnvVars }}
+          {{- range .Values.extraEnvVars }}
+            - name: {{ .name }}
+            {{- if .value }}
+              value: {{ tpl .value $ | quote }}
+            {{- end }}
+            {{- if .valueFrom }}
+              valueFrom:
+              {{- if .valueFrom.secretKeyRef }}
+                secretKeyRef:
+                  name: {{ tpl .valueFrom.secretKeyRef.name $ | quote }}
+                  key: {{ .valueFrom.secretKeyRef.key }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+          {{/*
+            Define Sentry environment variables
+          */}}
+          {{- if .Values.sentry }}
+            {{- if .Values.sentry.enabled  }}
+            - name: SENTRY_ENABLED
+              value: "true"
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: laa-submit-a-bulk-claim-secrets
+                  key: SENTRY_DSN
+            - name: SENTRY_ENVIRONMENT
+              value: {{ .Values.sentry.environment | quote }}
+            - name: SENTRY_TRACES_SAMPLE_RATE
+              value: {{ .Values.sentry.tracesSampleRate | quote }}
+          {{- end }}
+          {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-{{ .Chart.Name }}
+    app: {{ .Release.Name }}-{{ .Chart.Name }}-service
+spec:
+  {{ if and (hasKey .Values "stickiness") (eq .Values.stickiness.enabled true) }}
+  sessionAffinity: ClientIP
+  {{ end }}
+  ports:
+    {{ if .Values.ports }}
+    - protocol: {{ .Values.ports.protocol }}
+      name: {{ .Chart.Name }}-https
+      port: {{ .Values.ports.port }}
+      targetPort: {{ .Values.ports.targetPort }}
+    {{ else }}
+    - protocol: {{ .Values.global.ports.protocol }}
+      name: {{ .Chart.Name }}-https
+      port: {{ .Values.global.ports.port }}
+      targetPort: {{ .Values.global.ports.targetPort }}
+    {{- end }}
+    {{ if .Values.global.management.enabled }}
+    - protocol: {{ .Values.global.management.protocol }}
+      name: {{ .Chart.Name }}-management
+      port: {{ .Values.global.management.port }}
+      targetPort: {{ .Values.global.management.targetPort }}
+    {{- end }}
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-{{ .Chart.Name }}

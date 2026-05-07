@@ -1,7 +1,9 @@
-server:
-  port: 8083
+#server:
+  #port: 8083
 
 spring:
+  main:
+    web-application-type:  none # Disable web application access
   application:
     name: laa-data-claims-notify-service
     version: @version@

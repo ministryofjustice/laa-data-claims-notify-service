@@ -1,0 +1,14 @@
+replicas: 1
+metrics:
+  mainReleaseName: development
+
+grafana:
+  enabled: true
+
+autoscaling:
+  enabled: false
+
+sentry:
+  enabled: true
+  environment: development
+  tracesSampleRate: 0.25

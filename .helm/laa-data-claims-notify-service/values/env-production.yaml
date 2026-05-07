@@ -1,0 +1,25 @@
+# Not used as charts are made prod safe see values.yml
+
+serviceAccountName: laa-submit-a-bulk-claim-production-service-account
+
+grafana:
+  enabled: true
+
+ingress:
+  externalRoute:
+    enabled: true
+    hostname:
+      enabled: true
+      value: submit-a-bulk-claim.laa.service.justice.gov.uk
+      certSecretName: laa-sabc-cert
+
+extraEnvVars:
+  - name: ALLOWED_HOSTS
+    value: submit-a-bulk-claim.laa.service.justice.gov.uk
+  - name: CANONICAL_BASE_URL
+    value: https://submit-a-bulk-claim.laa.service.justice.gov.uk
+
+sentry:
+  enabled: true
+  environment: production
+  tracesSampleRate: 0.2

@@ -1,0 +1,44 @@
+metrics:
+  mainReleaseName: production
+
+global:
+  clusterDomain: apps.live.cloud-platform.service.justice.gov.uk
+
+  image:
+    repository: ""
+
+  management:
+    enabled: true
+    protocol: TCP
+    port: 8081
+    targetPort: 8183
+
+env:
+  - name: EXAMPLE_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: EXAMPLE_SECRET
+        optional: true
+
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+
+probe:
+  enabled: true
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 1Gi
+  requests:
+    cpu: 25m
+    memory: 384Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 4
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 60

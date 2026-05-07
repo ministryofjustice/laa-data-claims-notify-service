@@ -1,0 +1,9 @@
+env:
+  - name: EXAMPLE_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: EXAMPLE_SECRET
+
+autoscaling:
+  enabled: false
