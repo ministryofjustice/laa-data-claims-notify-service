@@ -14,12 +14,50 @@ global:
     targetPort: 8183
 
 env:
-  - name: EXAMPLE_SECRET
+  - name: ROOT_LOGGING_LEVEL
     valueFrom:
       secretKeyRef:
         name: laa-data-claims-notify-service-secrets
-        key: EXAMPLE_SECRET
+        key: ROOT_LOGGING_LEVEL
         optional: true
+  - name: SPRING_LOGGING_LEVEL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: SPRING_LOGGING_LEVEL
+        optional: true
+  - name: APP_LOGGING_LEVEL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: APP_LOGGING_LEVEL
+        optional: true
+  - name: AWS_REGION
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: AWS_REGION
+        optional: true
+  - name: AWS_SQS_NOTIFY_QUEUE_NAME
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: AWS_SQS_NOTIFY_QUEUE_NAME
+  - name: CLAIMS_API_URL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: CLAIMS_API_URL
+  - name: CLAIMS_API_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: CLAIMS_API_ACCESS_TOKEN
+  - name: NOTIFY_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: NOTIFY_API_KEY
 
 securityContext:
   fsGroup: 1000

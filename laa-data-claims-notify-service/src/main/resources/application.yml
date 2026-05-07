@@ -27,7 +27,7 @@ app:
     # Test access token found here: https://github.com/ministryofjustice/laa-data-claims-api/blob/main/claims-data/service/src/main/resources/application.yml
     access-token: ${CLAIMS_API_ACCESS_TOKEN:f67f968e-b479-4e61-b66e-f57984931e56}
   sqs:
-    notify-queue-name: ${SQS_NOTIFY_QUEUE_NAME:notify-queue}
+    notify-queue-name: ${AWS_SQS_NOTIFY_QUEUE_NAME:notify-queue}
   gov-notify:
     key: ${NOTIFY_API_KEY:123}
     templates:

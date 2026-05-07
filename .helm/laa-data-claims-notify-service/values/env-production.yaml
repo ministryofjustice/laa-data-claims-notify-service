@@ -13,12 +13,6 @@ ingress:
       value: submit-a-bulk-claim.laa.service.justice.gov.uk
       certSecretName: laa-sabc-cert
 
-extraEnvVars:
-  - name: ALLOWED_HOSTS
-    value: submit-a-bulk-claim.laa.service.justice.gov.uk
-  - name: CANONICAL_BASE_URL
-    value: https://submit-a-bulk-claim.laa.service.justice.gov.uk
-
 sentry:
   enabled: true
   environment: production
