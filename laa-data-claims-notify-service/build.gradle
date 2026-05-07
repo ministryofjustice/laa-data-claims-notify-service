@@ -76,6 +76,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-restclient'
     testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
 
+    testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
+    testImplementation 'org.testcontainers:mockserver:1.21.3'
+    testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
