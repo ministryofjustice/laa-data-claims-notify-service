@@ -158,13 +158,36 @@ When running with `--spring.profiles.active=local` (or the `local` Docker Compos
 
 ## Testing
 
-> Update after updating codebase
+Tests are split into two source sets:
+
+| Source set | Location | Purpose |
+|---|---|---|
+| Unit tests | `src/test/java` | Fast, isolated tests; Spring context load verification |
+| Integration tests | `src/integrationTest/java` | Full Spring context tests, including actuator endpoint checks |
+
+Run tests individually:
+
+```bash
+./gradlew test           # unit tests
+./gradlew integrationTest  # integration tests
+```
+
+Code coverage is tracked via Jacoco. The main application entry point (`LaaDataClaimsNotifyServiceApplication`) is excluded from coverage analysis. Coverage reports are generated automatically after the `test` task completes.
+
+> **Note:** The unit test context load disables AWS SQS (`spring.cloud.aws.sqs.enabled=false`) to allow the Spring context to start without a live AWS connection.
 
 ## CI/CD
 
-> Update after updating codebase
+GitHub Actions pipelines are defined in `.github/workflows/`:
 
-Snyk is used for both dependency vulnerability scanning and Docker image scanning.
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| `deploy-uat-preview.yml` | Pull request (all events) | Build, test, publish preview image to ECR, deploy ephemeral UAT preview environment and post URL to PR |
+| `build-main.yml` | PR merged to `main` | Build, test, publish versioned artefact to GitHub Packages, create Git tag |
+| `deploy-main.yml` | Tag push | Assemble, publish image to ECR, deploy sequentially to UAT → Staging → Production via Helm |
+| `helm-deploy.yml` | Reusable (called by above) | Authenticate to cluster, run `helm upgrade --install`, update ECR image tags |
+
+Semgrep static analysis is run as part of the build and test workflows. Deployments use Helm with a 5-minute rollout timeout per environment.
 
 ## Contributing
 
