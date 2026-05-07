@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "app.sqs.notify-queue-name",
+      "type": "java.lang.String",
+      "description": "The name of the SQS queue receiving notify messages from in AWS."
+  }
+] }

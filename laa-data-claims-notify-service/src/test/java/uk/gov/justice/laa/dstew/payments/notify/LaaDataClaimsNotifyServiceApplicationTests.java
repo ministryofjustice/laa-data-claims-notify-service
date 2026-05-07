@@ -3,7 +3,11 @@ package uk.gov.justice.laa.dstew.payments.notify;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(
+    properties = {
+        "spring.cloud.aws.sqs.enabled=false", // Disable AWS SQS functionality
+    }
+)
 class LaaDataClaimsNotifyServiceApplicationTests {
 
   @Test

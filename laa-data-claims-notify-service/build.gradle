@@ -40,7 +40,14 @@ dependencies {
     implementation 'io.prometheus:prometheus-metrics-tracer-initializer'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
+
+    // Access to Claims API
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Listening to SQS queue
+    implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.0')
+    //implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
     // Required for tracing information
     implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
