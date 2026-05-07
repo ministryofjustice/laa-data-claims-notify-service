@@ -20,20 +20,19 @@ import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 @EnableConfigurationProperties({ClaimsApiProperties.class})
 @ImportHttpServices(
     types = {
-        DataClaimsRestClient.class,
+      DataClaimsRestClient.class,
     },
     clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
 public class WebClientConfiguration {
 
-
   /**
-   * Configures a WebClient-based HTTP service group by applying common settings such as
-   * exchange strategies, base URL, and default authorization header.
+   * Configures a WebClient-based HTTP service group by applying common settings such as exchange
+   * strategies, base URL, and default authorization header.
    *
    * @param properties the configuration properties containing the base URL and authorization token
-   *                   for the Claims API
+   *     for the Claims API
    * @return a {@link WebClientHttpServiceGroupConfigurer} that applies the specified configuration
-   *         settings to each client in the service group
+   *     settings to each client in the service group
    */
   @Bean
   public WebClientHttpServiceGroupConfigurer groupConfigurer(final ClaimsApiProperties properties) {

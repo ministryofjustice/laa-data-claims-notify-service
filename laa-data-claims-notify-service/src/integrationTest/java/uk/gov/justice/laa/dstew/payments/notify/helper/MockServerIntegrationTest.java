@@ -20,7 +20,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockserver.client.MockServerClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.codec.ClientCodecConfigurer;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
@@ -94,7 +93,8 @@ public abstract class MockServerIntegrationTest {
   }
 
   protected @NotNull WebClient createWebClient() {
-    ApiProperties apiProperties = new ClaimsApiProperties(mockServerContainer.getEndpoint(), "1234");
+    ApiProperties apiProperties =
+        new ClaimsApiProperties(mockServerContainer.getEndpoint(), "1234");
     return createWebClient(apiProperties);
   }
 

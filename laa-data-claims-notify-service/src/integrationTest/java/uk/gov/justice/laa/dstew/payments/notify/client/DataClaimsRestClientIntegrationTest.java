@@ -9,12 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import uk.gov.justice.laa.dstew.payments.notify.helper.MockServerIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
-        "spring.cloud.aws.sqs.enabled=false", // Disable AWS SQS functionality
+      "spring.cloud.aws.sqs.enabled=false", // Disable AWS SQS functionality
     })
 @AutoConfigureMockMvc(addFilters = false)
-//@Import(WebMvcTestConfig.class)
+// @Import(WebMvcTestConfig.class)
 public class DataClaimsRestClientIntegrationTest extends MockServerIntegrationTest {
 
   protected DataClaimsRestClient dataClaimsRestClient;

@@ -8,12 +8,13 @@ import software.amazon.eventstream.Message;
 /**
  * Listener for messages which are sent to the Notify queue.
  *
- * <p>Messages arrive in this queue as follows:</p>
+ * <p>Messages arrive in this queue as follows:
+ *
  * <ol>
- *   <li>An upstream service publishes a message to an SNS topic.</li>
- *   <li>The topic is subscribed to a queue filtering for
- *    {@code SUBMISSION_VALIDATION_SUCCEEDED} messages.</li>
- *   <li>{@link NotifyQueueListener} processes the message.</li>
+ *   <li>An upstream service publishes a message to an SNS topic.
+ *   <li>The topic is subscribed to a queue filtering for {@code SUBMISSION_VALIDATION_SUCCEEDED}
+ *       messages.
+ *   <li>{@link NotifyQueueListener} processes the message.
  * </ol>
  *
  * @author Jamie Briggs

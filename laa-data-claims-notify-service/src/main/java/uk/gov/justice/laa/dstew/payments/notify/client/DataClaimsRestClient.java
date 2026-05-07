@@ -8,6 +8,4 @@ import org.springframework.web.service.annotation.HttpExchange;
  * @author Jamie Briggs
  */
 @HttpExchange("/api/v1")
-public interface DataClaimsRestClient {
-
-}
+public interface DataClaimsRestClient {}

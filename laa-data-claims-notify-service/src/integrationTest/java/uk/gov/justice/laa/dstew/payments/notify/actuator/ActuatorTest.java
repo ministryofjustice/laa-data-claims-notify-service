@@ -1,5 +1,7 @@
 package uk.gov.justice.laa.dstew.payments.notify.actuator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,28 +13,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
-@TestPropertySource(properties = {
-    "management.endpoints.web.exposure.include=health",
-})
+@TestPropertySource(
+    properties = {
+      "management.endpoints.web.exposure.include=health",
+    })
 class ActuatorTest {
 
-  @LocalManagementPort
-  private int managementPort;
+  @LocalManagementPort private int managementPort;
 
-  @Autowired
-  private TestRestTemplate restTemplate;
+  @Autowired private TestRestTemplate restTemplate;
 
   @Test
   @DisplayName("Actuator health endpoint should return UP status")
   void actuatorHealthEndpointShouldReturnUp() {
-    ResponseEntity<String> result = restTemplate.getForEntity("http://localhost:" + managementPort + "/actuator/health", String.class);
+    ResponseEntity<String> result =
+        restTemplate.getForEntity(
+            "http://localhost:" + managementPort + "/actuator/health", String.class);
 
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).contains("\"status\":\"UP\"");
   }
-
 }
