@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(
     properties = {
       "spring.cloud.aws.sqs.enabled=false", // Disable AWS SQS functionality
-      "spring.cloud.aws.region.static=eu-west-2",
       "app.gov-notify.key=123",
       "app.gov-notify.templates.example-email=acb95826-cb75-447f-9512-52a30c734dc2",
       "app.gov-notify.templates.example-email-two=e34f6b37-c300-41ab-bdaa-1e01c5d50b7a"
