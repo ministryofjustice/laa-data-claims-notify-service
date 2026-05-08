@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(
     properties = {
       "spring.cloud.aws.sqs.enabled=false", // Disable AWS SQS functionality
+      "spring.cloud.aws.region.static=eu-west-2"
     })
 class LaaDataClaimsNotifyServiceApplicationTests {
 

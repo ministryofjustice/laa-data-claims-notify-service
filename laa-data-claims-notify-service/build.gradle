@@ -180,3 +180,13 @@ spotless {
         googleJavaFormat('1.33.0')
     }
 }
+
+tasks.register('checkstyleAll') {
+    group = 'verification'
+    description = 'Runs checkstyleMain'
+    dependsOn tasks.matching { it.name in ['checkstyleMain'] }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('checkstyleAll')
+}
