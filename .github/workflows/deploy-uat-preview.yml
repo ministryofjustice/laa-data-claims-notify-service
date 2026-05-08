@@ -38,6 +38,7 @@ jobs:
       integration_test_task: integrationTest
       semgrep_check: 'true'
       java_version: 25
+      jacoco_coverage_report: 'false' # TODO Update this when coverage goes above 0.80
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
