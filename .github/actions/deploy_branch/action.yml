@@ -10,9 +10,6 @@ inputs:
   ecr-role-to-assume:
     description: "ECR role to assume"
     required: true
-  oidc-ecr-repository:
-    description: "OIDC ECR repository"
-    required: true
   kube-cert:
     description: "Kubernetes cluster authentication certificate"
     required: true
@@ -83,40 +80,16 @@ runs:
         ECR_REPOSITORY: ${{ inputs.ecr-repository }}
         ECR_REGION: ${{ inputs.ecr-region }}
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        OIDC_ECR_REPOSITORY: ${{ inputs.oidc-ecr-repository }}
         IMAGE_TAG: ${{ inputs.image-tag }}
         KUBE_NAMESPACE: ${{ inputs.kube-namespace }}
         VALUES_FILE: .helm/laa-data-claims-notify-service/values/env-${{ inputs.app-environment }}.yaml
         PREVIEW_VALUES_FILE: .helm/laa-data-claims-notify-service/values/env-${{ inputs.app-environment }}-preview.yaml
         RELEASE_NAME: ${{ steps.extract_release_name.outputs.release-name }}
         BRANCH_NAME: ${{ steps.extract_release_name.outputs.branch-name }}
-        OIDC_IMAGE_TAG: ${{ inputs.oidc-mock-image-tag }}
       run: |
         echo "Deploying image tag: $IMAGE_TAG under release name: $RELEASE_NAME to namespace: $KUBE_NAMESPACE"
 
         values_args=("--values" "$VALUES_FILE")
-
-        if [ "$BRANCH_NAME" != "main" ] && [ -f "$PREVIEW_VALUES_FILE" ]; then
-          values_args+=("--values" "$PREVIEW_VALUES_FILE")
-          helm upgrade "${RELEASE_NAME}-redis" oci://registry-1.docker.io/bitnamicharts/redis \
-            -f .helm/bitnami_redis/values.yaml \
-            --namespace "$KUBE_NAMESPACE" \
-            --install --wait --timeout=10m
-          oidc_values_args=(
-            --set image.repository="${ECR_REGISTRY}/${OIDC_ECR_REPOSITORY}"
-            --set sabc.releaseName="${RELEASE_NAME}"
-          )
-          if [ -n "$OIDC_IMAGE_TAG" ]; then
-            oidc_values_args+=(--set image.tag="${OIDC_IMAGE_TAG}")
-          fi
-          helm upgrade "${RELEASE_NAME}-oidc-mock" .helm/oidc-mock \
-            --namespace "$KUBE_NAMESPACE" \
-            "${oidc_values_args[@]}" \
-            --install --wait --timeout=10m
-          helm upgrade "pda-mock" .helm/pda-mock \
-            --namespace "$KUBE_NAMESPACE" \
-            --install --wait --timeout=10m
-        fi
 
         helm upgrade "$RELEASE_NAME" .helm/laa-data-claims-notify-service \
           --namespace "$KUBE_NAMESPACE" \
