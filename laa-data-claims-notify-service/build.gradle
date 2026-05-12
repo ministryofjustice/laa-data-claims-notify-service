@@ -46,14 +46,14 @@ sourceSets {
     }
 }
 
+// Upgrade to fix HTTP Request Smuggling (SNYK-JAVA-IONETTY-16425695)
+ext['netty.version'] = '4.2.13.Final'
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.prometheus:prometheus-metrics-tracer-initializer'
     implementation 'io.micrometer:micrometer-registry-prometheus'
-
-    // Override Netty version to fix Snyk vulnerabilities (transitive from webflux/spring-cloud-aws)
-    implementation platform('io.netty:netty-bom:4.2.13.Final')
 
     // Access to Claims API
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
