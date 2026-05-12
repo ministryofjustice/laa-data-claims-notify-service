@@ -76,12 +76,6 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          ports:
-            {{ if .Values.ports }}
-            - containerPort: {{ .Values.ports.targetPort }}
-            {{ else }}
-            - containerPort: {{ .Values.global.ports.targetPort }}
-            {{- end }}
           {{ if .Values.probe.enabled }}
           livenessProbe:
             httpGet:
@@ -223,17 +217,6 @@ spec:
   sessionAffinity: ClientIP
   {{ end }}
   ports:
-    {{ if .Values.ports }}
-    - protocol: {{ .Values.ports.protocol }}
-      name: {{ .Chart.Name }}-https
-      port: {{ .Values.ports.port }}
-      targetPort: {{ .Values.ports.targetPort }}
-    {{ else }}
-    - protocol: {{ .Values.global.ports.protocol }}
-      name: {{ .Chart.Name }}-https
-      port: {{ .Values.global.ports.port }}
-      targetPort: {{ .Values.global.ports.targetPort }}
-    {{- end }}
     {{ if .Values.global.management.enabled }}
     - protocol: {{ .Values.global.management.protocol }}
       name: {{ .Chart.Name }}-management

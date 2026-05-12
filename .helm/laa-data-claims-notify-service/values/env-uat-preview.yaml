@@ -1,9 +1,14 @@
-env:
-  - name: EXAMPLE_SECRET
-    valueFrom:
-      secretKeyRef:
-        name: laa-data-claims-notify-service-secrets
-        key: EXAMPLE_SECRET
+replicas: 1
+metrics:
+  mainReleaseName: uat
+
+grafana:
+  enabled: false
 
 autoscaling:
   enabled: false
+
+sentry:
+  enabled: true
+  environment: uat
+  tracesSampleRate: 0.25
