@@ -1,6 +1,5 @@
 # Not used as charts are made prod safe see values.yml
-
-serviceAccountName: laa-submit-a-bulk-claim-production-service-account
+serviceAccountName: claims-notify-service-prod-irsa-serviceaccount
 
 grafana:
   enabled: true
@@ -14,6 +13,6 @@ ingress:
       certSecretName: laa-sabc-cert
 
 sentry:
-  enabled: true
+  enabled: false
   environment: production
   tracesSampleRate: 0.2

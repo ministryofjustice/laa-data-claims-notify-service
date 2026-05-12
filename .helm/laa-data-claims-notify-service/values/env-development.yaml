@@ -1,3 +1,5 @@
+serviceAccountName: claims-notify-service-dev-irsa-serviceaccount
+
 replicas: 1
 metrics:
   mainReleaseName: development
@@ -9,6 +11,6 @@ autoscaling:
   enabled: false
 
 sentry:
-  enabled: true
+  enabled: false
   environment: development
   tracesSampleRate: 0.25

@@ -195,7 +195,7 @@ spec:
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
-                  name: laa-submit-a-bulk-claim-secrets
+                  name: laa-data-claims-notify-service-secrets
                   key: SENTRY_DSN
             - name: SENTRY_ENVIRONMENT
               value: {{ .Values.sentry.environment | quote }}

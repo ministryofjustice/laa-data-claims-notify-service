@@ -1,3 +1,5 @@
+serviceAccountName: claims-notify-service-staging-irsa-serviceaccount
+
 replicas: 1
 metrics:
   mainReleaseName: staging
@@ -9,6 +11,6 @@ autoscaling:
   enabled: false
 
 sentry:
-  enabled: true
+  enabled: false
   environment: staging
   tracesSampleRate: 0.25
