@@ -62,8 +62,9 @@ dependencies {
 
     // Listening to SQS queue
     implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.0')
-    //implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+    implementation 'software.amazon.awssdk:sts:2.33.7'
 
     // GOV Notify
     implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
