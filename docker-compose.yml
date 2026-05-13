@@ -4,8 +4,7 @@ services:
     build:
       context: .
     ports:
-      - "8083:8081"
-      - "8183:8181"
+      - "8183:8183"
       - "5083:5083"
     environment:
       - SERVER_PORT=8083

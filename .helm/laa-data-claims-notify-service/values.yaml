@@ -10,7 +10,7 @@ global:
   management:
     enabled: true
     protocol: TCP
-    port: 8081
+    port: 8183
     targetPort: 8183
 
 env:
