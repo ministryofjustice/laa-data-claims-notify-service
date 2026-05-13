@@ -38,11 +38,21 @@ env:
         name: laa-data-claims-notify-service-secrets
         key: AWS_REGION
         optional: true
+  - name: AWS_SQS_NOTIFY_QUEUE_URL
+    valueFrom:
+      secretKeyRef:
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_url
+  - name: AWS_SQS_NOTIFY_QUEUE_ARN
+    valueFrom:
+      secretKeyRef:
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_arn
   - name: AWS_SQS_NOTIFY_QUEUE_NAME
     valueFrom:
       secretKeyRef:
-        name: laa-data-claims-notify-service-secrets
-        key: AWS_SQS_NOTIFY_QUEUE_NAME
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_name
   - name: CLAIMS_API_URL
     valueFrom:
       secretKeyRef:
