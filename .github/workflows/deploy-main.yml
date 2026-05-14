@@ -27,28 +27,35 @@ jobs:
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
+  #pact-test:
+  #  needs: [ assemble ]
+  #  uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/pact-and-publish.yml@v2
+  #  permissions:
+  #    contents: write
+  #    packages: write
+  #  with:
+  #    pacticipant_name: "laa-data-claims-notify-service"
+  #    pact_test_task: "pactTest"
+  #    publish_pact_results: true
+  #    git_branch: 'main'
+  #    pact_tags: '${{ needs.assemble.outputs.published_artifact_version }},candidate'
+  ##    java_version: 25
+  #  secrets:
+  #    gh_token: ${{ secrets.GITHUB_TOKEN }}
+  #    pact_broker_url: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
+  #    pact_broker_username: ${{ secrets.PACT_BROKER_USERNAME }}
+  #    pact_broker_password: ${{ secrets.PACT_BROKER_PASSWORD }}
   pact-test:
-    needs: [ assemble ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/pact-and-publish.yml@v2
-    permissions:
-      contents: write
-      packages: write
-    with:
-      pacticipant_name: "laa-data-claims-notify-service"
-      pact_test_task: "pactTest"
-      publish_pact_results: true
-      git_branch: 'main'
-      pact_tags: '${{ needs.assemble.outputs.published_artifact_version }},candidate'
-      java_version: 25
-    secrets:
-      gh_token: ${{ secrets.GITHUB_TOKEN }}
-      pact_broker_url: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
-      pact_broker_username: ${{ secrets.PACT_BROKER_USERNAME }}
-      pact_broker_password: ${{ secrets.PACT_BROKER_PASSWORD }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disabled job
+        id: disabled-job
+        run: |
+          echo "This job is disabled and will not run"
 
   ecr-publish-image:
     needs: [ assemble ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@use-snyk-oauth
     permissions:
       contents: read
       id-token: write
@@ -62,7 +69,8 @@ jobs:
       ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}
       ecr_region: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REGION }}
       ecr_role_to_assume: ${{ secrets.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME }}
-      snyk_token: ${{ secrets.SNYK_TOKEN }}
+      snyk_client_id: ${{ secrets.SNYK_CLIENT_ID }}
+      snyk_client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
 
   deploy-uat:
     needs:
