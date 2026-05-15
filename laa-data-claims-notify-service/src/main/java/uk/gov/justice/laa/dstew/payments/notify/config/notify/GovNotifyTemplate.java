@@ -11,8 +11,6 @@ package uk.gov.justice.laa.dstew.payments.notify.config.notify;
  *       example-email: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000000}
  *       example-email-two: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000001}
  * }</pre>
- *
- * @author Jamie Briggs
  */
 public enum GovNotifyTemplate {
   // UPDATE THIS IN FUTURE ONCE EMAILS HAVE BEEN ADDED TO GOV NOTIFY - JAMIE BRIGGS

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Base class for API properties. */
 @Getter
 @Setter
 @AllArgsConstructor

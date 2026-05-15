@@ -11,11 +11,6 @@ import org.springframework.web.service.registry.HttpServiceGroup;
 import org.springframework.web.service.registry.ImportHttpServices;
 import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 
-/**
- * Configuration class for setting up the REST client for interacting with the Claims API.
- *
- * @author Jamie Briggs
- */
 @Configuration
 @EnableConfigurationProperties({ClaimsApiProperties.class})
 @ImportHttpServices(
@@ -25,15 +20,6 @@ import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
     clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
 public class WebClientConfiguration {
 
-  /**
-   * Configures a WebClient-based HTTP service group by applying common settings such as exchange
-   * strategies, base URL, and default authorization header.
-   *
-   * @param properties the configuration properties containing the base URL and authorization token
-   *     for the Claims API
-   * @return a {@link WebClientHttpServiceGroupConfigurer} that applies the specified configuration
-   *     settings to each client in the service group
-   */
   @Bean
   public WebClientHttpServiceGroupConfigurer groupConfigurer(final ClaimsApiProperties properties) {
     return groups ->

@@ -31,12 +31,6 @@ import org.testcontainers.utility.DockerImageName;
 import uk.gov.justice.laa.dstew.payments.notify.config.rest.ApiProperties;
 import uk.gov.justice.laa.dstew.payments.notify.config.rest.ClaimsApiProperties;
 
-/**
- * Abstract class which setups a test container for running MockServer. This helps test the rest
- * client classes with an interactable API.
- *
- * @author Jamie Briggs
- */
 @Slf4j
 @TestInstance(Lifecycle.PER_CLASS)
 public abstract class MockServerIntegrationTest {

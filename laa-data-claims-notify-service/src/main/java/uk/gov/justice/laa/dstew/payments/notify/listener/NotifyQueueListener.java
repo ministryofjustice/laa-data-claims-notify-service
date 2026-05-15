@@ -16,8 +16,6 @@ import software.amazon.eventstream.Message;
  *       messages.
  *   <li>{@link NotifyQueueListener} processes the message.
  * </ol>
- *
- * @author Jamie Briggs
  */
 @Slf4j
 @Component
