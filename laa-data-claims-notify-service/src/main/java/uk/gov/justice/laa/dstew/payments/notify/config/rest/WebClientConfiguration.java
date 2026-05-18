@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.dstew.payments.notify.config.rest;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +11,6 @@ import org.springframework.web.service.registry.ImportHttpServices;
 import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 
 @Configuration
-@EnableConfigurationProperties({ClaimsApiProperties.class})
 @ImportHttpServices(
     types = {
       DataClaimsRestClient.class,
@@ -29,9 +27,8 @@ public class WebClientConfiguration {
                   ExchangeStrategies.builder()
                       .codecs(ClientCodecConfigurer::defaultCodecs)
                       .build());
-              webClientBuilder.baseUrl(properties.getUrl());
-              webClientBuilder.defaultHeader(
-                  HttpHeaders.AUTHORIZATION, properties.getAccessToken());
+              webClientBuilder.baseUrl(properties.url());
+              webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, properties.accessToken());
             });
   }
 }

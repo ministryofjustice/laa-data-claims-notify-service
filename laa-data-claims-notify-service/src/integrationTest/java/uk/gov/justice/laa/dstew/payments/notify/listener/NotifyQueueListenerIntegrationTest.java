@@ -1,14 +1,17 @@
 package uk.gov.justice.laa.dstew.payments.notify.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,6 +19,7 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.localstack.LocalStackContainer;
@@ -24,6 +28,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
+import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 
 /**
@@ -70,12 +76,19 @@ class NotifyQueueListenerIntegrationTest {
   }
 
   @MockitoSpyBean private NotifyQueueListener listener;
+  @MockitoBean private DataClaimsRestClient claimsClient;
 
   @BeforeAll
   static void requireDocker() {
     Assumptions.assumeTrue(
         DockerClientFactory.instance().isDockerAvailable(),
         "Docker is not available, skipping the tests.");
+  }
+
+  @BeforeEach
+  void stubClaimsApi() {
+    when(claimsClient.getSubmission(any()))
+        .thenReturn(new SubmissionResponse().submissionId(VALID_UUID));
   }
 
   @AfterEach

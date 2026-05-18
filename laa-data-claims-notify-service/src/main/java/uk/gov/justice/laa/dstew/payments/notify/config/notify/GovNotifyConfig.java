@@ -9,6 +9,6 @@ public class GovNotifyConfig {
 
   @Bean
   public NotificationClient notificationClient(GovNotifyProperties govNotifyProperties) {
-    return new NotificationClient(govNotifyProperties.getKey());
+    return new NotificationClient(govNotifyProperties.key());
   }
 }

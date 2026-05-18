@@ -5,8 +5,11 @@ import static java.util.Objects.isNull;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
+import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 
 /**
@@ -17,17 +20,30 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
  * delivered. This consumer trusts that filter and only validates the body.
  *
  * <p>Payloads missing a submission UUID are acknowledged without downstream action — redelivery
- * would not change the outcome. Jackson parse failures (including malformed UUIDs) bubble up so
- * Spring Cloud AWS can apply queue retry / DLQ policy.
+ * would not change the outcome. All claims-api failures (404, 5xx, timeout) and Jackson parse
+ * failures bubble so Spring Cloud AWS applies the queue retry / DLQ policy.
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class NotifyQueueListener {
+
+  private final DataClaimsRestClient claimsClient;
 
   @SqsListener("${app.sqs.notify-queue-name}")
   public void receiveNotifyEvent(SubmissionEvent event) {
-    parseSubmissionId(event)
-        .ifPresent(id -> log.info("Received notify event for submission_id={}", id));
+    parseSubmissionId(event).ifPresent(this::enrich);
+  }
+
+  private void enrich(UUID submissionId) {
+    SubmissionResponse response = claimsClient.getSubmission(submissionId);
+    log.info(
+        "Enriched notify event: submission_id={} office={} period={} area_of_law={} status={}",
+        response.getSubmissionId(),
+        response.getOfficeAccountNumber(),
+        response.getSubmissionPeriod(),
+        response.getAreaOfLaw(),
+        response.getStatus());
   }
 
   static Optional<UUID> parseSubmissionId(SubmissionEvent event) {
