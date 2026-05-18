@@ -13,7 +13,7 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 @DisplayName("NotifyQueueListener")
 class NotifyQueueListenerTest {
 
-  private static final String VALID_UUID = "11111111-1111-1111-1111-111111111111";
+  private static final UUID VALID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
   private final NotifyQueueListener listener = new NotifyQueueListener();
 
@@ -25,7 +25,7 @@ class NotifyQueueListenerTest {
     void returnsUuidForValidEvent() {
       Optional<UUID> result =
           NotifyQueueListener.parseSubmissionId(new SubmissionEvent(VALID_UUID));
-      assertThat(result).contains(UUID.fromString(VALID_UUID));
+      assertThat(result).contains(VALID_UUID);
     }
 
     @Test
@@ -36,17 +36,6 @@ class NotifyQueueListenerTest {
     @Test
     void returnsEmptyForNullSubmissionId() {
       assertThat(NotifyQueueListener.parseSubmissionId(new SubmissionEvent(null))).isEmpty();
-    }
-
-    @Test
-    void returnsEmptyForBlankSubmissionId() {
-      assertThat(NotifyQueueListener.parseSubmissionId(new SubmissionEvent("   "))).isEmpty();
-    }
-
-    @Test
-    void returnsEmptyForNonUuidSubmissionId() {
-      assertThat(NotifyQueueListener.parseSubmissionId(new SubmissionEvent("not-a-uuid")))
-          .isEmpty();
     }
   }
 
@@ -63,12 +52,6 @@ class NotifyQueueListenerTest {
     @Test
     void swallowsMissingSubmissionIdWithoutThrowing() {
       assertThatCode(() -> listener.receiveNotifyEvent(new SubmissionEvent(null)))
-          .doesNotThrowAnyException();
-    }
-
-    @Test
-    void swallowsInvalidSubmissionIdWithoutThrowing() {
-      assertThatCode(() -> listener.receiveNotifyEvent(new SubmissionEvent("not-a-uuid")))
           .doesNotThrowAnyException();
     }
 

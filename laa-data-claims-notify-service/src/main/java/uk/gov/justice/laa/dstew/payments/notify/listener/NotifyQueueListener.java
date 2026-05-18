@@ -1,10 +1,11 @@
 package uk.gov.justice.laa.dstew.payments.notify.listener;
 
+import static java.util.Objects.isNull;
+
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 
@@ -15,9 +16,9 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
  * SubmissionEventType} attribute, so only {@code SUBMISSION_VALIDATION_SUCCEEDED} events are
  * delivered. This consumer trusts that filter and only validates the body.
  *
- * <p>Payloads missing a valid submission UUID are acknowledged without downstream action —
- * redelivery would not change the outcome. Jackson parse failures bubble up so Spring Cloud AWS can
- * apply queue retry / DLQ policy.
+ * <p>Payloads missing a submission UUID are acknowledged without downstream action — redelivery
+ * would not change the outcome. Jackson parse failures (including malformed UUIDs) bubble up so
+ * Spring Cloud AWS can apply queue retry / DLQ policy.
  */
 @Slf4j
 @Component
@@ -30,20 +31,15 @@ public class NotifyQueueListener {
   }
 
   static Optional<UUID> parseSubmissionId(SubmissionEvent event) {
-    if (event == null) {
+    if (isNull(event)) {
       log.error("Discarding notify event: payload is null");
       return Optional.empty();
     }
-    String value = event.submissionId();
-    if (StringUtils.isBlank(value)) {
-      log.error("Discarding notify event: submission_id is missing or blank");
+    UUID submissionId = event.submissionId();
+    if (isNull(submissionId)) {
+      log.error("Discarding notify event: submission_id is missing");
       return Optional.empty();
     }
-    try {
-      return Optional.of(UUID.fromString(value));
-    } catch (IllegalArgumentException ex) {
-      log.error("Discarding notify event: submission_id '{}' is not a UUID", value);
-      return Optional.empty();
-    }
+    return Optional.of(submissionId);
   }
 }

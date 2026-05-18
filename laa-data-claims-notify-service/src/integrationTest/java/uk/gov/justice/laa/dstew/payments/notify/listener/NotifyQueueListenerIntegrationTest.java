@@ -1,11 +1,11 @@
 package uk.gov.justice.laa.dstew.payments.notify.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,10 +35,11 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 class NotifyQueueListenerIntegrationTest {
 
   private static final String QUEUE_NAME = "notify-queue-it";
-  private static final String VALID_UUID = "11111111-1111-1111-1111-111111111111";
+  private static final UUID VALID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
   private static final LocalStackContainer LOCALSTACK =
-      new LocalStackContainer(DockerImageName.parse("localstack/localstack:3.2")).withServices(SQS);
+      new LocalStackContainer(DockerImageName.parse("localstack/localstack:4.14"))
+          .withServices(SQS);
 
   private static SqsClient sqsClient;
   private static String queueUrl;
@@ -91,15 +92,5 @@ class NotifyQueueListenerIntegrationTest {
     ArgumentCaptor<SubmissionEvent> captor = ArgumentCaptor.forClass(SubmissionEvent.class);
     verify(listener, timeout(5000)).receiveNotifyEvent(captor.capture());
     assertThat(captor.getValue().submissionId()).isEqualTo(VALID_UUID);
-  }
-
-  @Test
-  @DisplayName("a payload with a non-UUID submission_id is delivered and discarded without error")
-  void deliversMalformedPayloadAndListenerDoesNotThrow() {
-    sqsClient.sendMessage(
-        b -> b.queueUrl(queueUrl).messageBody("{\"submission_id\":\"not-a-uuid\"}"));
-
-    verify(listener, timeout(5000))
-        .receiveNotifyEvent(argThat(e -> "not-a-uuid".equals(e.submissionId())));
   }
 }
