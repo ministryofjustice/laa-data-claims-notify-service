@@ -152,7 +152,6 @@ laa-data-claims-notify-service/src/main/resources/application.yml
 | `CLAIMS_API_ACCESS_TOKEN`         | Access token for the Claims API              | (test token — override in deployed envs)       |
 | `AWS_SQS_NOTIFY_QUEUE_NAME`       | Name of the SQS queue to consume from        | `notify-queue`                                 |
 | `NOTIFY_API_KEY`                  | GOV.UK Notify API key                        | `123` (invalid — must be set in deployed envs) |
-| `NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID`| GOV.UK Notify template ID for example emails | `00000000-0000-0000-0000-000000000000`          |
 | `ROOT_LOGGING_LEVEL`              | Root log level                               | `info`                                         |
 | `SPRING_LOGGING_LEVEL`            | Spring framework log level                   | `info`                                         |
 | `APP_LOGGING_LEVEL`               | Application log level                        | `info`                                         |
