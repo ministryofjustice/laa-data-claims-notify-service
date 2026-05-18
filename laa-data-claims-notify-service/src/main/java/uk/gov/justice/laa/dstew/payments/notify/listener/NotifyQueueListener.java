@@ -34,7 +34,7 @@ public class NotifyQueueListener {
       log.error("Discarding notify event: payload is null");
       return Optional.empty();
     }
-    String value = event.getSubmissionId();
+    String value = event.submissionId();
     if (StringUtils.isBlank(value)) {
       log.error("Discarding notify event: submission_id is missing or blank");
       return Optional.empty();

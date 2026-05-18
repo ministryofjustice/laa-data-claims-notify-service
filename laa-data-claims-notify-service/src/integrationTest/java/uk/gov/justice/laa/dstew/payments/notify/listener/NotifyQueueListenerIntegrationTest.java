@@ -90,7 +90,7 @@ class NotifyQueueListenerIntegrationTest {
 
     ArgumentCaptor<SubmissionEvent> captor = ArgumentCaptor.forClass(SubmissionEvent.class);
     verify(listener, timeout(5000)).receiveNotifyEvent(captor.capture());
-    assertThat(captor.getValue().getSubmissionId()).isEqualTo(VALID_UUID);
+    assertThat(captor.getValue().submissionId()).isEqualTo(VALID_UUID);
   }
 
   @Test
@@ -100,6 +100,6 @@ class NotifyQueueListenerIntegrationTest {
         b -> b.queueUrl(queueUrl).messageBody("{\"submission_id\":\"not-a-uuid\"}"));
 
     verify(listener, timeout(5000))
-        .receiveNotifyEvent(argThat(e -> "not-a-uuid".equals(e.getSubmissionId())));
+        .receiveNotifyEvent(argThat(e -> "not-a-uuid".equals(e.submissionId())));
   }
 }

@@ -20,12 +20,12 @@ class SubmissionEventTest {
 
     SubmissionEvent event = mapper.readValue(json, SubmissionEvent.class);
 
-    assertThat(event.getSubmissionId()).isEqualTo("11111111-1111-1111-1111-111111111111");
+    assertThat(event.submissionId()).isEqualTo("11111111-1111-1111-1111-111111111111");
   }
 
   @Test
   void deserialisesPayloadWithMissingFieldAsNull() throws Exception {
     SubmissionEvent event = mapper.readValue("{}", SubmissionEvent.class);
-    assertThat(event.getSubmissionId()).isNull();
+    assertThat(event.submissionId()).isNull();
   }
 }
