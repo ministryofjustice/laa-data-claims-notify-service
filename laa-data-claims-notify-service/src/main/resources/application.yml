@@ -30,9 +30,6 @@ app:
     notify-queue-name: ${AWS_SQS_NOTIFY_QUEUE_NAME:notify-queue}
   gov-notify:
     key: ${NOTIFY_API_KEY:123}
-    templates:
-      example-email: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000000}
-      example-email-two: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000001}
 
 sentry:
   dsn: # configure dsn url here
