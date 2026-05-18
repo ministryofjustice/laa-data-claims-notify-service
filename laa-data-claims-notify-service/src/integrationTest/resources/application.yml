@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    aws:
+      region:
+        static: eu-west-2
+app:
+  gov-notify:
+    key: 123
+    templates:
+      example-email: 00000000-0000-0000-0000-000000000000
+      example-email-two: 00000000-0000-0000-0000-000000000001
+  sqs:
+    notify-queue-name: notify-queue

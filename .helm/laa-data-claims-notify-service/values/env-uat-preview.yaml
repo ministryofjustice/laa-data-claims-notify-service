@@ -1,0 +1,16 @@
+serviceAccountName: claims-notify-service-uat-irsa-serviceaccount
+
+replicas: 1
+metrics:
+  mainReleaseName: uat
+
+grafana:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+sentry:
+  enabled: false
+  environment: uat
+  tracesSampleRate: 0.25

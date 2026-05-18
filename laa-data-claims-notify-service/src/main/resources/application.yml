@@ -1,0 +1,77 @@
+server:
+  port: -1 # Disables the main HTTP server
+
+spring:
+  main:
+    web-application-type:  servlet # Disable web application access
+  application:
+    name: laa-data-claims-notify-service
+    version: @version@
+  cloud:
+    aws:
+      region:
+        static: ${AWS_REGION:eu-west-2}
+management:
+  server:
+    port: 8183
+  # specify actuator endpoints to enable
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+
+app:
+  claims-api:
+    # Default port for Claims API found here: https://github.com/ministryofjustice/laa-data-claims-parent/blob/main/README.md
+    url: ${CLAIMS_API_URL:http://localhost:8080}
+    # Test access token found here: https://github.com/ministryofjustice/laa-data-claims-api/blob/main/claims-data/service/src/main/resources/application.yml
+    access-token: ${CLAIMS_API_ACCESS_TOKEN:f67f968e-b479-4e61-b66e-f57984931e56}
+  sqs:
+    notify-queue-name: ${AWS_SQS_NOTIFY_QUEUE_NAME:notify-queue}
+  gov-notify:
+    key: ${NOTIFY_API_KEY:123}
+    templates:
+      example-email: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000000}
+      example-email-two: ${NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID:00000000-0000-0000-0000-000000000001}
+
+sentry:
+  dsn: # configure dsn url here
+  environment: # configure environment name here
+
+# ECS structured logging
+logging:
+  level:
+    root: ${ROOT_LOGGING_LEVEL:info}
+    org.springframework: ${SPRING_LOGGING_LEVEL:info}
+    uk.gov.justice.laa.springboot.microservice: ${APP_LOGGING_LEVEL:info}
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        name: ${spring.application.name:default}
+        version: ${spring.application.version:default}
+        environment: ${spring.profiles.active:default}
+        node_name: ${HOSTNAME:unknown}
+
+---
+# local profile configuration
+spring:
+  config:
+    activate:
+      on-profile: local
+  cloud:
+    aws:
+      # Localstack configuration
+      credentials:
+        access-key: default
+        secret-key: default
+      endpoint: http://localhost:4566
+
+logging:
+  level:
+    root: ${ROOT_LOGGING_LEVEL:info}
+    org.springframework: ${SPRING_LOGGING_LEVEL:info}
+    uk.gov.justice.laa.springboot.microservice: ${APP_LOGGING_LEVEL:info}
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr{faint} %clr([%15.15t]){faint} %clr([%X{traceId:-},%X{spanId:-}]){yellow} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"

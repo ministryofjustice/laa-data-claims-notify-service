@@ -1,0 +1,92 @@
+metrics:
+  mainReleaseName: production
+
+global:
+  clusterDomain: apps.live.cloud-platform.service.justice.gov.uk
+
+  image:
+    repository: ""
+
+  management:
+    enabled: true
+    protocol: TCP
+    port: 8183
+    targetPort: 8183
+
+env:
+  - name: ROOT_LOGGING_LEVEL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: ROOT_LOGGING_LEVEL
+        optional: true
+  - name: SPRING_LOGGING_LEVEL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: SPRING_LOGGING_LEVEL
+        optional: true
+  - name: APP_LOGGING_LEVEL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: APP_LOGGING_LEVEL
+        optional: true
+  - name: AWS_REGION
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: AWS_REGION
+        optional: true
+  - name: AWS_SQS_NOTIFY_QUEUE_URL
+    valueFrom:
+      secretKeyRef:
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_url
+  - name: AWS_SQS_NOTIFY_QUEUE_ARN
+    valueFrom:
+      secretKeyRef:
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_arn
+  - name: AWS_SQS_NOTIFY_QUEUE_NAME
+    valueFrom:
+      secretKeyRef:
+        name: sqs-claims-notify-queue-secret
+        key: sqs_queue_name
+  - name: CLAIMS_API_URL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: CLAIMS_API_URL
+  - name: CLAIMS_API_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: CLAIMS_API_ACCESS_TOKEN
+  - name: NOTIFY_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: NOTIFY_API_KEY
+
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+
+probe:
+  enabled: true
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 1Gi
+  requests:
+    cpu: 25m
+    memory: 384Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 4
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 60

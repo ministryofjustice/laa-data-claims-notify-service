@@ -1,0 +1,198 @@
+plugins {
+    id 'io.freefair.lombok' version '9.4.0'
+    id("com.diffplug.spotless") version "7.2.1"
+    id 'uk.gov.laa.springboot.laa-spring-boot-gradle-plugin'
+    id 'io.sentry.jvm.gradle' version '6.5.0'
+    id 'au.com.dius.pact' version '4.6.19'
+}
+
+// Replaces application.yml @version@  with version from gradle.properties
+processResources {
+    filesMatching('application.yml') {
+        filter {
+            it.replace('@version@', version)
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/LaaDataClaimsNotifyServiceApplication.class'])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/LaaDataClaimsNotifyServiceApplication.class'])
+        }))
+    }
+}
+
+// To keep pact/accessibility stuff seperate
+sourceSets {
+    pactTest {
+        java.srcDir file('src/pactTest/java')
+        resources.srcDir file('src/pactTest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+    }
+}
+
+// Upgrade to fix HTTP Request Smuggling (SNYK-JAVA-IONETTY-16425695)
+ext['netty.version'] = '4.2.13.Final'
+// Upgrade to fix tomcat issue
+ext['tomcat.version'] = '11.0.22'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.prometheus:prometheus-metrics-tracer-initializer'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    // Access to Claims API
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Listening to SQS queue
+    implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.0')
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+    implementation 'software.amazon.awssdk:sts:2.33.7'
+
+    // GOV Notify
+    implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
+
+    // Required for tracing information
+    implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
+    implementation 'org.apache.commons:commons-lang3:3.20.0'
+
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-restclient'
+    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
+    testImplementation 'org.testcontainers:mockserver:1.21.3'
+    testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    pactTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.19'
+}
+
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+
+    pactTestImplementation.extendsFrom testImplementation
+    pactTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.register('pactTest', Test) {
+
+    failOnNoDiscoveredTests = false;
+
+    systemProperty "pact.content_type.override.application/json", "application/json;charset=utf-8"
+
+    description = 'Runs the pact tests.'
+    group = 'verification'
+
+    def pactsDir = layout.buildDirectory.dir("pacts").get().asFile
+    doFirst {
+        if (pactsDir.exists()) {
+            pactsDir.deleteDir()
+        }
+    }
+
+    testClassesDirs = sourceSets.pactTest.output.classesDirs
+    classpath = sourceSets.pactTest.runtimeClasspath
+    useJUnitPlatform()
+    // Resolve the directory path to a String for the system property
+    systemProperty 'pact.rootDir', layout.buildDirectory.dir("pacts").get().asFile.path
+}
+
+tasks.named('processPactTestResources') {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+
+pact {
+    publish {
+        pactBrokerUrl = project.findProperty('pactBrokerUrl') ?: System.getenv('PACT_BROKER_URL') ?: 'https://laa-data-pact-broker.apps.live.cloud-platform.service.justice.gov.uk/'
+        pactBrokerUsername = project.findProperty('pactBrokerUsername') ?: System.getenv('PACT_BROKER_USERNAME') ?: 'ABC'
+        pactBrokerPassword = project.findProperty('pactBrokerPassword') ?: System.getenv('PACT_BROKER_PASSWORD') ?: 'ABC'
+
+        pactDirectory = layout.buildDirectory.dir("pacts").get().asFile.path
+
+        def projectVersion = project.version != 'unspecified' ? project.version : '1.0.0';
+        def gitSha = providers.environmentVariable('GIT_SHA').getOrNull()
+        // Define the branch from a property, environment variable, or fallback to 'main'
+        def branchName = providers.environmentVariable('GIT_BRANCH').getOrElse('main')
+
+        // If we have a SHA, append it to the version for uniqueness
+        consumerVersion = gitSha ? gitSha : projectVersion
+
+        // For newer Pact Brokers (Recommended)
+        consumerBranch = branchName
+
+        // For older Brokers/compatibility
+        tags = [branchName, projectVersion]
+
+
+        // Add 'release' tag if branchName matches semantic version pattern (X.X.XXX)
+        if (branchName ==~ /\d+\.\d+\.\d+/) {
+            tags.add('release')
+        }
+        // Optional: add a generic 'dev' tag for anything not on main
+        else if (branchName != 'main' && branchName != 'master') {
+            tags.add('dev')
+        }
+
+        def pactTagsInput = providers.environmentVariable('PACT_TAGS').getOrNull()
+        if (pactTagsInput) {
+            pactTagsInput.split(',').each { tag ->
+                tags.add(tag.trim())
+            }
+        }
+
+
+
+    }
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        importOrder()
+        removeUnusedImports()
+        cleanthat()
+        googleJavaFormat('1.33.0')
+    }
+}
+
+tasks.register('checkstyleAll') {
+    group = 'verification'
+    description = 'Runs checkstyleMain'
+    dependsOn tasks.matching { it.name in ['checkstyleMain'] }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('checkstyleAll')
+}

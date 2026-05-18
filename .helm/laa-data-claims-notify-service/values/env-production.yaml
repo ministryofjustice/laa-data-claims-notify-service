@@ -1,0 +1,18 @@
+# Not used as charts are made prod safe see values.yml
+serviceAccountName: claims-notify-service-prod-irsa-serviceaccount
+
+grafana:
+  enabled: true
+
+ingress:
+  externalRoute:
+    enabled: true
+    hostname:
+      enabled: true
+      value: submit-a-bulk-claim.laa.service.justice.gov.uk
+      certSecretName: laa-sabc-cert
+
+sentry:
+  enabled: false
+  environment: production
+  tracesSampleRate: 0.2

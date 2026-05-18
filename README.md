@@ -1,259 +1,256 @@
-# laa-spring-boot-microservice-template
-[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/laa-spring-boot-microservice-template/badge)](https://github-community.service.justice.gov.uk/repository-standards/laa-spring-boot-microservice-template)
+# laa-data-claims-notify-service
 
-### ⚠️ WORK IN PROGRESS ⚠️
-This template is still under development and features may be added or subject to change.
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/laa-data-claims-notify-service/badge)](https://github-community.service.justice.gov.uk/repository-standards/laa-data-claims-notify-service)
 
 ## Overview
 
-Template GitHub repository used for Spring Boot Java microservice projects.
+`laa-data-claims-notify-service` is an intermediary notification service within the LAA Data Claims
+domain.
 
-The project uses the `laa-spring-boot-gradle-plugin` Gradle plugin which provides
-sensible defaults for the following plugins:
+It consumes messages from an AWS SNS topic and uses those messages to dispatch emails
+via [GOV.UK Notify](https://www.notifications.service.gov.uk/). This decouples email delivery from
+individual upstream services — any service that needs to send a notification publishes an event to
+SNS, and this service handles delivery.
 
-- [Checkstyle](https://docs.gradle.org/current/userguide/checkstyle_plugin.html)
-- [Dependency Management](https://plugins.gradle.org/plugin/io.spring.dependency-management)
-- [Jacoco](https://docs.gradle.org/current/userguide/jacoco_plugin.html)
-- [Java](https://docs.gradle.org/current/userguide/java_plugin.html)
-- [Maven Publish](https://docs.gradle.org/current/userguide/publishing_maven.html)
-- [Spring Boot](https://plugins.gradle.org/plugin/org.springframework.boot)
-- [Test Logger](https://github.com/radarsh/gradle-test-logger-plugin)
-- [Versions](https://github.com/ben-manes/gradle-versions-plugin)
+**Benefits of this pattern:**
 
-The plugin is provided by -  [laa-spring-boot-common](https://github.com/ministryofjustice/laa-spring-boot-common), where you can find
-more information regarding setup and usage.
+- Centralised email delivery and template management
+- Upstream services have no dependency on GOV.UK Notify directly
+- New notification channels (e.g. SMS, letters) can be added here without changes to upstream
+  services
+- Consistent observability and error handling across all outbound notifications
+
+### How it works
+
+```
+Upstream Service(s)
+       │
+       │  publish event
+       ▼
+   AWS SNS Topic
+       │
+       │  consume message
+       ▼
+laa-data-claims-notify-service
+       │
+       │  send email
+       ▼
+   GOV.UK Notify
+```
 
 ### Project Structure
-Includes the following subprojects:
 
-- `spring-boot-microservice-api` - example OpenAPI specification used for generating API stub interfaces and documentation.
-- `spring-boot-microservice-service` - example REST API service with CRUD operations interfacing a JPA repository with an in-memory database.
+This is a multi-module Gradle project:
 
-## Setup Instructions
-Once you've created your repository using this template, perform the following steps:
-
-### Update README
-Edit this `README.md` file to document your project accurately. Take the time to create a clear, engaging, and informative`README.md` file. Include information such as what your project does, how to install and run it, how to contribute, and any other pertinent details.
-
-### Update Repository Description
-Change the description that appears at the top of your repository's main page to provide an overview of your project.
-
-### Grant Team Permissions
-Assign permissions to the appropriate Ministry of Justice teams. Ensure at least one team is granted Admin permissions. Whenever possible, assign permissions to teams rather than individual users.
-
-### Add Branch Protection rules
-Ensure branch protection is set up on the `main` branch.
-
-### Update CODEOWNERS
-(Optional) Modify the `CODEOWNERS` file to specify the teams or users authorized to approve pull requests.
-
-### Configure Dependabot
-The template includes `.github/dependabot.yml` with weekly updates configured for Gradle and GitHub Actions.
-
-After creating your repository from this template:
-
-- Review the contents of `.github/dependabot.yml` and make the following changes if needed:
-  - Change `uk.gov.laa.springboot.microservice.*` package references to `uk.gov.laa.{application-package-name}.*`.
-  - Review schedule settings (`day`, `time`, `timezone`, and `cooldown`) and update if needed.
-  - Update `labels` to match your repository conventions.
-  - Uncomment the `registries` section and follow the inline instructions if you need updates from `laa-spring-boot-common`.
-- Configure `CODEOWNERS` and enable required code owner review in repository branch protection/rulesets so Dependabot PRs route to the correct team.
-- Add `REPO_TOKEN` as a repository secret if `registries` is enabled.
-- See `Required GitHub repository settings after template creation` for repository-level security toggles.
-
-### Required GitHub repository settings after template creation
-
-- Enable Dependabot security updates (`Settings` -> `Security` -> `Code security and analysis`).
-- (Optional) Enable auto-merge for low-risk dependency PRs (`Settings` -> `General` -> `Pull Requests` -> `Allow auto-merge`).
-
-### Add Repository To Snyk
-Ensure that your repository has been added to the [Legal Aid Agency Snyk](https://app.snyk.io/org/legal-aid-agency) organisation.
-
-Also add `SNYK_TOKEN` as a repository secret.
-
-### Update Project Files
-<details>
-
-<summary>Click here for more details on which files to update.</summary>
-
-#### 1. Rename subproject directories
-Ensure to rename `spring-boot-microservice-api` and `spring-boot-microservice-service` directories to your application name:
-`{application-name}-api` and `{application-name}-service`.
-
-Update `settings.gradle` as follows:
 ```
-rootProject.name = '{repository-name}'
-
-include '{application-name}-api'
-include '{application-name}-service'
+laa-data-claims-notify-service/          # repository root
+├── laa-data-claims-notify-service/      # Spring Boot application module
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── uk/gov/justice/laa/dstew/payments/notify/
+│   │   │   └── resources/
+│   │   │       └── application.yml      # application configuration
+│   │   ├── test/                        # unit tests
+│   │   └── integrationTest/             # integration tests
+│   │   └── pactTest/                    # PACT tests
+│   └── build.gradle
+├── config/
+│   └── checkstyle/
+│       └── checkstyle.xml               # Google Java Style rules
+├── .github/workflows/                   # CI/CD pipelines
+├── Dockerfile
+├── docker-compose.yml
+├── build.gradle
+└── settings.gradle
 ```
 
-Update `build.gradle` in the project root directory as follows:
-```
-subprojects {
-    group = 'uk.gov.justice.laa.{application-name}'
-}
-```
+## Prerequisites
 
-#### 2. Update api subproject
-Update the following files found in the `{application-name}-api` directory:
+- Java 25 (Amazon Corretto)
+- Docker and Docker Compose
 
-- `open-api-specification.yml` - replace the contents of this file with the API specification for your application.
-- `build.gradle` - replace all references to `spring-boot-microservice-api` with `{service-name}-api`.
+## Building and Running the Application
 
-#### 3. Update service subproject
+### Via gradlew
 
-Rename the package name/directory - `uk.gov.justice.laa.springboot.microservice` to `uk.gov.justice.laa.{application-package-name}`
-under `src/integrationTest/java`, `src/main/java`, `src/test/java`.
+Build the application:
 
-Update the following properties in `src/main/resources/application.yml` with your application details:
-`spring.application.name`, `info.app.name`, `info.app.description`
-
-#### 4. Update Dockerfile
-Rename the `laa-spring-boot-microservice` directory and jar file name to  `laa-{application-name}`.
-
-#### 5. Update GitHub workflow
-The following workflows have been provided:
-
-* Build and test PR - `build-test-pr.yml`
-* Build and deploy after PR merged - `pr-merge-main.yml`
-
-In the above workflow files, change all occurrences of the `spring-boot-microservice-service/build/` build path to `{application-name}-service/build/`.
-
-</details>
-
-### Database scripts
-The *.sql scripts in  `src/main/resources` have been included to provide an example database for demonstration purposes only and should be removed for your application.
-
-## Build And Run Application
-
-### Build application
-`./gradlew clean build`
-
-### Run integration tests
-`./gradlew integrationTest`
-
-### Run application
-`./gradlew bootRun`
-
-### Run application via Docker
-`docker compose up`
-
-### Debug application running via Docker
-
-#### Configuration
-
-* Go to Run > Edit Configurations
-* Click + (Add New Configuration)
-* Select Remote JVM Debug
-* Configure:
-* Name: Docker Debug
-* Debugger mode: Attach to remote JVM
-* Host: localhost
-* Port: 5005
-* Use module classpath: Select (laa-spring-boot-microservice-template)
-
-#### Debugging
-* run `docker compose up`
-* run > Debug 'Docker Debug'
-
-#### Local Development Logging
-
-When running with the `local` profile, structured logging is disabled, for console output:
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew clean build
 ```
 
-### Logging Configuration
+Run tests:
 
-This application uses **ECS (Elastic Common Schema) structured logging** for production environments and console logging for local development.
+```bash
+# Unit tests
+./gradlew test
 
-#### Structured Logging (Default/Production)
+# Integration tests
+./gradlew integrationTest
 
-By default, the application outputs logs in ECS JSON format with distributed tracing support:
-```json
-{
-  "@timestamp": "2026-03-06T16:25:18.992904Z",
-  "ecs": {
-    "version": "8.11"
-  },
-  "log": {
-    "level": "INFO",
-    "logger": "uk.gov.justice.laa.springboot.microservice.controller.ItemController"
-  },
-  "message": "Getting all items",
-  "process": {
-    "pid": 49402,
-    "thread": {
-      "name": "http-nio-8080-exec-2"
-    }
-  },
-  "service": {
-    "environment": "local",
-    "name": "laa-spring-boot-microservice",
-    "node": {
-      "name": "unknown"
-    },
-    "version": "1.0.0"
-  },
-  "spanId": "fe4586c5fd5f7021",
-  "traceId": "69aaffee8d19869cfe4586c5fd5f7021"
-}
-```
-#### logback-spring.xml Conflicts
-
-Adding `logback-spring.xml` will:
-- Override the profile-based logging configuration in `application.yml`
-
-## Application Endpoints
-
-### API Documentation
-
-#### Swagger UI
-- http://localhost:8081/swagger-ui/index.html
-
-#### API docs (JSON)
-- http://localhost:8081/v3/api-docs
-
-### Actuator Endpoints
-The following actuator endpoints have been configured:
-- http://localhost:8081/actuator
-- http://localhost:8081/actuator/health
-
-## Application Configuration
-
-### Sentry
-In order to integrate with Sentry, the following properties need to be configured in the `application.yml`:
-
-```
-sentry:
-  dsn: <configure sentry dsn url here>
-  environment: <configure environment name here>
+# Pact Tests
+./gradlew pactTest
 ```
 
-## Libraries Used
-- [Spring Boot Actuator](https://docs.spring.io/spring-boot/reference/actuator/index.html) - used to provide various endpoints to help monitor the application, such as view application health and information.
-- [Spring Boot Web](https://docs.spring.io/spring-boot/reference/web/index.html) - used to provide features for building the REST API implementation.
-- [Spring Data JPA](https://docs.spring.io/spring-data/jpa/reference/jpa.html) - used to simplify database access and interaction, by providing an abstraction over persistence technologies, to help reduce boilerplate code.
-- [Springdoc OpenAPI](https://springdoc.org/) - used to generate OpenAPI documentation. It automatically generates Swagger UI, JSON documentation based on your Spring REST APIs.
-- used to capture application exception events at runtime, which can be monitored via the Sentry UI.
-- [Lombok](https://projectlombok.org/) - used to help to reduce boilerplate Java code by automatically generating common
-  methods like getters, setters, constructors etc. at compile-time using annotations.
-- [MapStruct](https://mapstruct.org/) - used for object mapping, specifically for converting between different Java object types, such as Data Transfer Objects (DTOs)
-  and Entity objects. It generates mapping code at compile code.
-- [H2](https://www.h2database.com/html/main.html) - used to provide an example database and should not be used in production.
-- [Sentry for Java SDK](https://docs.sentry.io/platforms/java/) - used to capture application exception events at runtime, which can be monitored via the Sentry UI.
+# TODO: Add documentation on SNS and SQS setup. Event service already has config for setting up a localstack instance and processing queue. This probably should be amended to also create a second queue and new SNS to keep it all together.
 
-## ⚠️ Temporary Dependency Overrides
+Run the service locally:
 
-The following Gradle dependency overrides are **temporary** and should be removed once the dependency versions are
-available in a future `laa-spring-boot-common` release.
+```bash
+./gradlew :laa-data-claims-notify-service:bootRun
+```
 
-| Dependency                                  | Overridden Version | Reason                                                                                                                                    | Date Added |
-|---------------------------------------------|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `com.fasterxml.jackson.core:jackson-core`   | `2.21.2`           | Fixes Snyk issue - [SNYK-JAVA-COMFASTERXMLJACKSONCORE-15907551](https://security.snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-15907551) | 2026-04-30 |
-| `org.apache.tomcat.embed:tomcat-embed-core` | `11.0.21`          | Fixes Snyk issues - [SNYK-JAVA-ORGAPACHETOMCATEMBED-15989820](https://security.snyk.io/vuln/SNYK-JAVA-ORGAPACHETOMCATEMBED-15989820)      | 2026-04-30 |
-| `tools.jackson.core:jackson-core`           | `3.1.1`            | Fixes Snyk issue - [SNYK-JAVA-TOOLSJACKSONCORE-15907550](https://security.snyk.io/vuln/SNYK-JAVA-TOOLSJACKSONCORE-15907550)               | 2026-04-30 |
+Run with the local Spring profile (human-readable console logging, no ECS structured output):
 
+```bash
+./gradlew :laa-data-claims-notify-service:bootRun --args='--spring.profiles.active=local'
+```
 
+### Via docker compose
 
+Start all services:
+
+```bash
+docker compose up --build
+```
+
+Start in detached mode:
+
+```bash
+docker compose up --build -d
+```
+
+Stop and remove containers:
+
+```bash
+docker compose down 
+```
+
+## Local Endpoints
+
+| Service         | URL                                     |
+|-----------------|-----------------------------------------|
+| Actuator health | `http://localhost:8183/actuator/health` |
+| Remote debug    | `localhost:5083`                        |
+
+## Configuration
+
+The main configuration file is:
+
+```
+laa-data-claims-notify-service/src/main/resources/application.yml
+```
+
+### Key environment variables
+
+| Variable                          | Description                                  | Default                                        |
+|-----------------------------------|----------------------------------------------|------------------------------------------------|
+| `SPRING_PROFILES_ACTIVE`          | Active Spring profile                        | —                                              |
+| `AWS_REGION`                      | AWS region                                   | `eu-west-2`                                    |
+| `CLAIMS_API_URL`                  | Base URL of the Claims API                   | `http://localhost:8080`                        |
+| `CLAIMS_API_ACCESS_TOKEN`         | Access token for the Claims API              | (test token — override in deployed envs)       |
+| `AWS_SQS_NOTIFY_QUEUE_NAME`       | Name of the SQS queue to consume from        | `notify-queue`                                 |
+| `NOTIFY_API_KEY`                  | GOV.UK Notify API key                        | `123` (invalid — must be set in deployed envs) |
+| `NOTIFY_EXAMPLE_EMAIL_TEMPLATE_ID`| GOV.UK Notify template ID for example emails | `00000000-0000-0000-0000-000000000000`          |
+| `ROOT_LOGGING_LEVEL`              | Root log level                               | `info`                                         |
+| `SPRING_LOGGING_LEVEL`            | Spring framework log level                   | `info`                                         |
+| `APP_LOGGING_LEVEL`               | Application log level                        | `info`                                         |
+| `sentry.dsn`                      | Sentry DSN for error tracking                | —                                              |
+| `sentry.environment`              | Sentry environment label                     | —                                              |
+
+## Logging
+
+Structured [ECS-format](https://www.elastic.co/guide/en/ecs/current/index.html) logging is enabled
+by default, suitable for ingestion by a log aggregation platform.
+
+When running with `--spring.profiles.active=local` (or the `local` Docker Compose profile),
+structured logging is disabled in favour of a human-readable console format with trace/span IDs
+included.
+
+Code coverage is tracked via Jacoco. The main application entry point (
+`LaaDataClaimsNotifyServiceApplication`) is excluded from coverage analysis. Coverage reports are
+generated automatically after the `test` task completes.
+
+> **Note:** The unit test context load disables AWS SQS (`spring.cloud.aws.sqs.enabled=false`) to
+> allow the Spring context to start without a live AWS connection.
+
+## CI/CD
+
+GitHub Actions pipelines are defined in `.github/workflows/`:
+
+| Workflow                 | Trigger                    | Purpose                                                                                                |
+|--------------------------|----------------------------|--------------------------------------------------------------------------------------------------------|
+| `deploy-uat-preview.yml` | Pull request (all events)  | Build, test, publish preview image to ECR, deploy ephemeral UAT preview environment and post URL to PR |
+| `build-main.yml`         | PR merged to `main`        | Build, test, publish versioned artefact to GitHub Packages, create Git tag                             |
+| `deploy-main.yml`        | Tag push                   | Assemble, publish image to ECR, deploy sequentially to UAT → Staging → Production via Helm             |
+| `helm-deploy.yml`        | Reusable (called by above) | Authenticate to cluster, run `helm upgrade --install`, update ECR image tags                           |
+
+Semgrep static analysis is run as part of the build and test workflows. Deployments use Helm with a
+5-minute rollout timeout per environment.
+
+## Code Style and Formatting
+
+[Spotless](https://github.com/diffplug/spotless) is used to enforce consistent Java formatting. It
+applies Google Java Format and removes unused imports automatically.
+
+Apply formatting:
+
+```bash
+./gradlew spotlessApply
+```
+
+Check formatting without modifying files:
+
+```bash
+./gradlew spotlessCheck
+```
+
+Spotless runs automatically on staged Java files via the pre-commit hook (see below), so formatting
+is applied before each commit.
+
+## Pre-commit Hooks
+
+This project uses [`prek`](https://github.com/ministryofjustice/devsecops-hooks) to manage
+pre-commit hooks. Run the setup script once after cloning:
+
+```bash
+./scripts/setup-hooks.sh
+```
+
+This installs `prek` and activates the hooks defined in `.pre-commit-config.yaml`. On each commit
+the following checks run automatically:
+
+| Hook                           | What it does                                                   |
+|--------------------------------|----------------------------------------------------------------|
+| **Spotless**                   | Applies Google Java Format to staged Java files                |
+| **Checkstyle**                 | Validates code style against Google Java Style rules           |
+| **GitHub Actions SHA pinning** | Ensures external Actions are pinned to full-length commit SHAs |
+| **MoJ baseline scanner**       | Runs Ministry of Justice DevSecOps baseline security checks    |
+
+You can also trigger the hooks manually against all files:
+
+```bash
+prek run --all-files
+```
+
+## Commit Signing
+
+All commits must be GPG-signed. Configure Git to sign commits automatically:
+
+```bash
+git config --global commit.gpgsign true
+```
+
+If you do not have a GPG key set up, follow
+the [GitHub guide on generating a GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
+and add it to your GitHub account before contributing.
+
+## Contributing
+
+- Branch from `main` and open a pull request
+- Run the hook setup script (`./scripts/setup-hooks.sh`) after cloning so pre-commit checks run
+  locally
+- Ensure all unit and integration tests pass: `./gradlew clean build integrationTest`
+- All commits must be GPG-signed
+- Keep changes covered by appropriate tests before raising a PR
