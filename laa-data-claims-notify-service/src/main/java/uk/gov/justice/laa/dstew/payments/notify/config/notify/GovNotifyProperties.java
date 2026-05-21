@@ -4,4 +4,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Bound from {@code app.gov-notify.*} in {@code application.yml}. */
 @ConfigurationProperties(prefix = "app.gov-notify")
-public record GovNotifyProperties(String key) {}
+public record GovNotifyProperties(String key, String templateId) {}
