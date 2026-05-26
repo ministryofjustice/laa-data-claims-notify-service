@@ -30,6 +30,7 @@ app:
     notify-queue-name: ${AWS_SQS_NOTIFY_QUEUE_NAME:notify-queue}
   gov-notify:
     key: ${NOTIFY_API_KEY:123}
+    template-id: ab0ab8ce-31bd-4d3d-a01d-83e9c8720369
 
 sentry:
   dsn: # configure dsn url here

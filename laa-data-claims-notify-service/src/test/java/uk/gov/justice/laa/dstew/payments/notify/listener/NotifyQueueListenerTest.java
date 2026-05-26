@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,8 @@ import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
 import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionStatus;
 import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
+import uk.gov.justice.laa.dstew.payments.notify.service.NotifyEmailService;
+import uk.gov.service.notify.NotificationClientException;
 
 @DisplayName("NotifyQueueListener")
 class NotifyQueueListenerTest {
@@ -27,7 +30,9 @@ class NotifyQueueListenerTest {
   private static final UUID VALID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
   private final DataClaimsRestClient claimsClient = mock(DataClaimsRestClient.class);
-  private final NotifyQueueListener listener = new NotifyQueueListener(claimsClient);
+  private final NotifyEmailService notifyEmailService = mock(NotifyEmailService.class);
+  private final NotifyQueueListener listener =
+      new NotifyQueueListener(claimsClient, notifyEmailService);
 
   @Nested
   @DisplayName("parseSubmissionId")
@@ -56,7 +61,7 @@ class NotifyQueueListenerTest {
   class ReceiveNotifyEvent {
 
     @Test
-    void fetchesAndLogsSubmissionForValidUuid() {
+    void fetchesAndSendsEmailForValidUuid() throws NotificationClientException {
       SubmissionResponse response =
           new SubmissionResponse()
               .submissionId(VALID_UUID)
@@ -69,20 +74,22 @@ class NotifyQueueListenerTest {
       assertThatCode(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .doesNotThrowAnyException();
       verify(claimsClient).getSubmission(VALID_UUID);
+      verify(notifyEmailService).sendValidationSuccessEmail(response);
     }
 
     @Test
-    void bubblesNotFoundSoSqsRedelivers() {
+    void bubblesNotFoundSoSqsRedelivers() throws NotificationClientException {
       when(claimsClient.getSubmission(any()))
           .thenThrow(
               WebClientResponseException.create(404, "Not Found", null, new byte[0], null, null));
 
       assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .isInstanceOf(WebClientResponseException.class);
+      verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
     }
 
     @Test
-    void rethrowsServerErrorSoSqsRedelivers() {
+    void rethrowsServerErrorSoSqsRedelivers() throws NotificationClientException {
       when(claimsClient.getSubmission(any()))
           .thenThrow(
               WebClientResponseException.create(
@@ -90,19 +97,34 @@ class NotifyQueueListenerTest {
 
       assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .isInstanceOf(WebClientResponseException.class);
+      verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
     }
 
     @Test
-    void skipsEnrichmentForMissingSubmissionId() {
+    void bubblesNotificationClientExceptionSoSqsRedelivers() throws NotificationClientException {
+      SubmissionResponse response = new SubmissionResponse().submissionId(VALID_UUID);
+      when(claimsClient.getSubmission(VALID_UUID)).thenReturn(response);
+      doThrow(new NotificationClientException("boom"))
+          .when(notifyEmailService)
+          .sendValidationSuccessEmail(response);
+
+      assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
+          .isInstanceOf(NotificationClientException.class);
+    }
+
+    @Test
+    void skipsEnrichmentForMissingSubmissionId() throws NotificationClientException {
       assertThatCode(() -> listener.receiveNotifyEvent(new SubmissionEvent(null)))
           .doesNotThrowAnyException();
       verify(claimsClient, never()).getSubmission(any());
+      verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
     }
 
     @Test
-    void skipsEnrichmentForNullEvent() {
+    void skipsEnrichmentForNullEvent() throws NotificationClientException {
       assertThatCode(() -> listener.receiveNotifyEvent(null)).doesNotThrowAnyException();
       verify(claimsClient, never()).getSubmission(any());
+      verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
     }
   }
 }

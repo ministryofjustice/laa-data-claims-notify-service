@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
 import uk.gov.justice.laa.dstew.payments.notify.client.DataClaimsRestClient;
 import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
+import uk.gov.justice.laa.dstew.payments.notify.service.NotifyEmailService;
+import uk.gov.service.notify.NotificationClientException;
 
 /**
  * Listener for messages which are sent to the Notify queue.
@@ -20,8 +22,9 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
  * delivered. This consumer trusts that filter and only validates the body.
  *
  * <p>Payloads missing a submission UUID are acknowledged without downstream action — redelivery
- * would not change the outcome. All claims-api failures (404, 5xx, timeout) and Jackson parse
- * failures bubble so Spring Cloud AWS applies the queue retry / DLQ policy.
+ * would not change the outcome. All claims-api failures (404, 5xx, timeout), Jackson parse
+ * failures, and {@link NotificationClientException}s bubble so Spring Cloud AWS applies the queue
+ * retry / DLQ policy.
  */
 @Slf4j
 @Component
@@ -29,13 +32,17 @@ import uk.gov.justice.laa.dstew.payments.notify.model.event.SubmissionEvent;
 public class NotifyQueueListener {
 
   private final DataClaimsRestClient claimsClient;
+  private final NotifyEmailService notifyEmailService;
 
   @SqsListener("${app.sqs.notify-queue-name}")
-  public void receiveNotifyEvent(SubmissionEvent event) {
-    parseSubmissionId(event).ifPresent(this::enrich);
+  public void receiveNotifyEvent(SubmissionEvent event) throws NotificationClientException {
+    Optional<UUID> submissionId = parseSubmissionId(event);
+    if (submissionId.isPresent()) {
+      enrichAndNotify(submissionId.get());
+    }
   }
 
-  private void enrich(UUID submissionId) {
+  private void enrichAndNotify(UUID submissionId) throws NotificationClientException {
     SubmissionResponse response = claimsClient.getSubmission(submissionId);
     log.info(
         "Enriched notify event: submission_id={} office={} period={} area_of_law={} status={}",
@@ -44,6 +51,7 @@ public class NotifyQueueListener {
         response.getSubmissionPeriod(),
         response.getAreaOfLaw(),
         response.getStatus());
+    notifyEmailService.sendValidationSuccessEmail(response);
   }
 
   static Optional<UUID> parseSubmissionId(SubmissionEvent event) {
