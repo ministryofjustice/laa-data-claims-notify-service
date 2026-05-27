@@ -16,12 +16,12 @@ jobs:
     with:
       integration_test_task: "integrationTest"
       create_tag: 'true'
-      github_bot_username: 'laa-ccms-caab-service'
+      github_bot_username: 'laa-data-claims-notify-service'
       semgrep_check: 'false'
       java_version: 25
       jacoco_coverage_report: 'false' # TODO Update this when coverage goes above 0.80
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-      github_app_id: ${{ vars.LAA_CCMS_CAAB_SERVICE_APP_ID }}
-      github_app_private_key: ${{ secrets.LAA_CCMS_CAAB_SERVICE_KEY }}
+      github_app_id: ${{ vars.LAA_JAVA_SERVICE_DEPLOYER_APP_ID }}
+      github_app_private_key: ${{ secrets.LAA_JAVA_SERVICE_DEPLOYER_KEY }}
       github_app_organisation: 'ministryofjustice'
