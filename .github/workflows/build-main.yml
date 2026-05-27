@@ -19,7 +19,7 @@ jobs:
       github_bot_username: 'laa-data-claims-notify-service'
       semgrep_check: 'false'
       java_version: 25
-      jacoco_coverage_report: 'false' # TODO Update this when coverage goes above 0.80
+      jacoco_coverage_report: 'true'
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
       github_app_id: ${{ vars.LAA_JAVA_SERVICE_DEPLOYER_APP_ID }}

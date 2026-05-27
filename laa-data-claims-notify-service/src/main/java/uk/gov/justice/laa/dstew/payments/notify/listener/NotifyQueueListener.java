@@ -3,9 +3,10 @@ package uk.gov.justice.laa.dstew.payments.notify.listener;
 import static java.util.Objects.isNull;
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
@@ -28,30 +29,60 @@ import uk.gov.service.notify.NotificationClientException;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class NotifyQueueListener {
 
   private final DataClaimsRestClient claimsClient;
   private final NotifyEmailService notifyEmailService;
+  private final Counter receivedCounter;
+  private final Counter processingSuccessCounter;
+  private final Counter processingFailedCounter;
+
+  public NotifyQueueListener(
+      DataClaimsRestClient claimsClient,
+      NotifyEmailService notifyEmailService,
+      MeterRegistry meterRegistry) {
+    this.claimsClient = claimsClient;
+    this.notifyEmailService = notifyEmailService;
+    this.receivedCounter =
+        Counter.builder("notify.event.received")
+            .description("Total number of notify events received from the queue")
+            .register(meterRegistry);
+    this.processingSuccessCounter =
+        Counter.builder("notify.processing.success")
+            .description("Total number of notify events processed successfully end-to-end")
+            .register(meterRegistry);
+    this.processingFailedCounter =
+        Counter.builder("notify.processing.failed")
+            .description("Total number of notify events that failed during processing")
+            .register(meterRegistry);
+  }
 
   @SqsListener("${app.sqs.notify-queue-name}")
   public void receiveNotifyEvent(SubmissionEvent event) throws NotificationClientException {
+    receivedCounter.increment();
     Optional<UUID> submissionId = parseSubmissionId(event);
-    if (submissionId.isPresent()) {
-      enrichAndNotify(submissionId.get());
+    if (submissionId.isEmpty()) {
+      return;
     }
-  }
-
-  private void enrichAndNotify(UUID submissionId) throws NotificationClientException {
-    SubmissionResponse response = claimsClient.getSubmission(submissionId);
-    log.info(
-        "Enriched notify event: submission_id={} office={} period={} area_of_law={} status={}",
-        response.getSubmissionId(),
-        response.getOfficeAccountNumber(),
-        response.getSubmissionPeriod(),
-        response.getAreaOfLaw(),
-        response.getStatus());
-    notifyEmailService.sendValidationSuccessEmail(response);
+    UUID id = submissionId.get();
+    log.info("Received notify event: submission_id={}", id);
+    try {
+      SubmissionResponse response = claimsClient.getSubmission(id);
+      log.info(
+          "Enriched notify event: submission_id={} office={} period={} area_of_law={} status={}",
+          response.getSubmissionId(),
+          response.getOfficeAccountNumber(),
+          response.getSubmissionPeriod(),
+          response.getAreaOfLaw(),
+          response.getStatus());
+      notifyEmailService.sendValidationSuccessEmail(response);
+      processingSuccessCounter.increment();
+      log.info("Processed notify event: submission_id={}", id);
+    } catch (RuntimeException | NotificationClientException ex) {
+      processingFailedCounter.increment();
+      log.error("Failed to process notify event: submission_id={}", id, ex);
+      throw ex;
+    }
   }
 
   static Optional<UUID> parseSubmissionId(SubmissionEvent event) {
