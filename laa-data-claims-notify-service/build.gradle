@@ -63,7 +63,7 @@ dependencies {
     implementation 'uk.gov.justice.laa.datastewardship.payments:data-claims-api-models:1.0.42'
 
     // Listening to SQS queue
-    implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.0')
+    implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.2')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
     implementation 'software.amazon.awssdk:sts:2.33.7'

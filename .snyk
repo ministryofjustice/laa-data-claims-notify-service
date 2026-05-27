@@ -3,10 +3,16 @@ version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 #
 ignore:
-# Example entry format:
-#  SNYK-VULNERABILITY-ID:
-#    - '<package>@<version>':
-#        reason: <reason for ignoring>
-#        expires: YYYY-MM-DDTHH:MI:SS.000Z
-#        created: YYYY-MM-DDTHH:MI:SS.000Z
+  SNYK-UBUNTU2404-GLIBC-15804597:
+    - '*':
+        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
+        expires: 2026-06-26T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-15804816:
+    - '*':
+        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
+        expires: 2026-06-26T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-15884040:
+    - '*':
+        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
+        expires: 2026-06-26T00:00:00.000Z
 patch: {}
