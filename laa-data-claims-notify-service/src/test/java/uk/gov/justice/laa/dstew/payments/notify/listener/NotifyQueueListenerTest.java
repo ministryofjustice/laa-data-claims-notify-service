@@ -10,6 +10,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +33,13 @@ class NotifyQueueListenerTest {
 
   private final DataClaimsRestClient claimsClient = mock(DataClaimsRestClient.class);
   private final NotifyEmailService notifyEmailService = mock(NotifyEmailService.class);
+  private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
   private final NotifyQueueListener listener =
-      new NotifyQueueListener(claimsClient, notifyEmailService);
+      new NotifyQueueListener(claimsClient, notifyEmailService, meterRegistry);
+
+  private double counter(String name) {
+    return meterRegistry.get(name).counter().count();
+  }
 
   @Nested
   @DisplayName("parseSubmissionId")
@@ -75,6 +82,9 @@ class NotifyQueueListenerTest {
           .doesNotThrowAnyException();
       verify(claimsClient).getSubmission(VALID_UUID);
       verify(notifyEmailService).sendValidationSuccessEmail(response);
+      assertThat(counter("notify.event.received")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.success")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.failed")).isEqualTo(0.0);
     }
 
     @Test
@@ -86,6 +96,9 @@ class NotifyQueueListenerTest {
       assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .isInstanceOf(WebClientResponseException.class);
       verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
+      assertThat(counter("notify.event.received")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.failed")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.success")).isEqualTo(0.0);
     }
 
     @Test
@@ -98,6 +111,7 @@ class NotifyQueueListenerTest {
       assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .isInstanceOf(WebClientResponseException.class);
       verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
+      assertThat(counter("notify.processing.failed")).isEqualTo(1.0);
     }
 
     @Test
@@ -110,6 +124,8 @@ class NotifyQueueListenerTest {
 
       assertThatThrownBy(() -> listener.receiveNotifyEvent(new SubmissionEvent(VALID_UUID)))
           .isInstanceOf(NotificationClientException.class);
+      assertThat(counter("notify.processing.failed")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.success")).isEqualTo(0.0);
     }
 
     @Test
@@ -118,6 +134,9 @@ class NotifyQueueListenerTest {
           .doesNotThrowAnyException();
       verify(claimsClient, never()).getSubmission(any());
       verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
+      assertThat(counter("notify.event.received")).isEqualTo(1.0);
+      assertThat(counter("notify.processing.success")).isEqualTo(0.0);
+      assertThat(counter("notify.processing.failed")).isEqualTo(0.0);
     }
 
     @Test
@@ -125,6 +144,7 @@ class NotifyQueueListenerTest {
       assertThatCode(() -> listener.receiveNotifyEvent(null)).doesNotThrowAnyException();
       verify(claimsClient, never()).getSubmission(any());
       verify(notifyEmailService, never()).sendValidationSuccessEmail(any());
+      assertThat(counter("notify.event.received")).isEqualTo(1.0);
     }
   }
 }
