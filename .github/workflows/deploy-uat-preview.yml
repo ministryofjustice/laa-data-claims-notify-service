@@ -29,7 +29,7 @@ jobs:
 
   build-and-test:
     needs: [ define-preview-version ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.1.2
     permissions:
       contents: write
       packages: write
@@ -65,7 +65,7 @@ jobs:
 
   ecr-publish-image:
     needs: [ build-and-test ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.1.2
     permissions:
       contents: read
       id-token: write
