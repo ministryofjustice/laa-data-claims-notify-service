@@ -13,10 +13,10 @@ public class NotifyPersonalisationMapper {
 
   public Map<String, Object> toPersonalisation(SubmissionResponse submission) {
     Map<String, Object> personalisation = new LinkedHashMap<>();
-    personalisation.put("submission_reference", String.valueOf(submission.getSubmissionId()));
     personalisation.put("office_account", nullSafe(submission.getOfficeAccountNumber()));
     personalisation.put("submission_period", nullSafe(submission.getSubmissionPeriod()));
     personalisation.put("area_of_law", areaOfLawValue(submission.getAreaOfLaw()));
+    personalisation.put("submission_url", "https://www.google.com");
     return personalisation;
   }
 
