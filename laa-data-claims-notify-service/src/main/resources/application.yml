@@ -66,7 +66,7 @@ spring:
       credentials:
         access-key: default
         secret-key: default
-      endpoint: http://localhost:4566
+      endpoint: ${SPRING_CLOUD_AWS_SQS_ENDPOINT:http://localhost:4566}
 
 logging:
   level:
