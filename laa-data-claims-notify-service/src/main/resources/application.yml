@@ -31,6 +31,8 @@ app:
   gov-notify:
     key: ${NOTIFY_API_KEY:123}
     successful-submission-id: acb95826-cb75-447f-9512-52a30c734dc2
+  sabc:
+    url: ${SABC_BASE_URL:http://localhost:8082}
 
 sentry:
   dsn: # configure dsn url here

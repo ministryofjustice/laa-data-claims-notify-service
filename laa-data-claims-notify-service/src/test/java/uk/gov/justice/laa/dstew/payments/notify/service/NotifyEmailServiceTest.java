@@ -26,10 +26,10 @@ class NotifyEmailServiceTest {
   private static final UUID SUBMISSION_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
   private static final String RECIPIENT = "provider.user@example.com";
   private static final UUID TEMPLATE_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
-
+  private static final String SABC_URL = "http://localhost:8080";
   private final NotificationClient notificationClient = mock(NotificationClient.class);
   private final NotifyPersonalisationMapper personalisationMapper =
-      new NotifyPersonalisationMapper();
+      new NotifyPersonalisationMapper(SABC_URL);
   private final GovNotifyProperties properties = new GovNotifyProperties("test-key", TEMPLATE_ID);
   private final NotifyEmailService service =
       new NotifyEmailService(notificationClient, personalisationMapper, properties);

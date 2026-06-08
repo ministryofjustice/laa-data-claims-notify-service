@@ -13,8 +13,9 @@ import uk.gov.justice.laa.dstew.payments.claimsdata.model.SubmissionResponse;
 class NotifyPersonalisationMapperTest {
 
   private static final UUID SUBMISSION_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String SABC_URL = "http://localhost:8082";
 
-  private final NotifyPersonalisationMapper mapper = new NotifyPersonalisationMapper();
+  private final NotifyPersonalisationMapper mapper = new NotifyPersonalisationMapper(SABC_URL);
 
   @Test
   void mapsAllFieldsWhenPresent() {
@@ -28,7 +29,7 @@ class NotifyPersonalisationMapperTest {
     Map<String, Object> personalisation = mapper.toPersonalisation(submission);
 
     assertThat(personalisation)
-        .containsEntry("submission_reference", SUBMISSION_ID.toString())
+        .containsEntry("submission_url", SABC_URL + "/submission/" + SUBMISSION_ID)
         .containsEntry("office_account", "OFFICE-1")
         .containsEntry("submission_period", "JUL-2025")
         .containsEntry("area_of_law", AreaOfLaw.LEGAL_HELP.getValue());
@@ -41,19 +42,19 @@ class NotifyPersonalisationMapperTest {
     Map<String, Object> personalisation = mapper.toPersonalisation(submission);
 
     assertThat(personalisation)
-        .containsEntry("submission_reference", SUBMISSION_ID.toString())
+        .containsEntry("submission_url", SABC_URL + "/submission/" + SUBMISSION_ID)
         .containsEntry("office_account", "")
         .containsEntry("submission_period", "")
         .containsEntry("area_of_law", "");
   }
 
   @Test
-  void serialisesNullSubmissionIdAsStringNull() {
+  void serialisesNullSubmissionIdAsBaseUrl() {
     SubmissionResponse submission = new SubmissionResponse();
 
     Map<String, Object> personalisation = mapper.toPersonalisation(submission);
 
-    assertThat(personalisation).containsEntry("submission_reference", "null");
+    assertThat(personalisation).containsEntry("submission_url", SABC_URL);
   }
 
   @Test
