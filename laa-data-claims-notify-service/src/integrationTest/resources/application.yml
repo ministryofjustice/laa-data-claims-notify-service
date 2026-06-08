@@ -6,6 +6,6 @@ spring:
 app:
   gov-notify:
     key: 123
-    template-id: 00000000-0000-0000-0000-000000000000
+    successful-submission-template-id: acb95826-cb75-447f-9512-52a30c734dc2
   sqs:
     notify-queue-name: notify-queue
