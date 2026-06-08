@@ -13,5 +13,9 @@ services:
     environment:
       - SERVER_PORT=8083
       - SPRING_PROFILES_ACTIVE=local
-      - SPRING_CLOUD_AWS_SQS_ENDPOINT=http://localstack:4566
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5083
+      - NOTIFY_API_KEY=${NOTIFY_API_KEY}
+      - SPRING_CLOUD_AWS_SQS_ENDPOINT=http://localstack:4566
+      - AWS_SQS_NOTIFY_QUEUE_NAME=notify-queue
+      - AWS_REGION=us-east-1
+      - CLAIMS_API_URL=http://host.docker.internal:8080

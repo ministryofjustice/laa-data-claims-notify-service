@@ -30,7 +30,7 @@ app:
     notify-queue-name: ${AWS_SQS_NOTIFY_QUEUE_NAME:notify-queue}
   gov-notify:
     key: ${NOTIFY_API_KEY:123}
-    successful-submission-id: acb95826-cb75-447f-9512-52a30c734dc2
+    successful-submission-template-id: a11499ff-b0a9-4773-9e1b-626721680cdf
   sabc:
     url: ${SABC_BASE_URL:http://localhost:8082}
 
@@ -53,25 +53,3 @@ logging:
         version: ${spring.application.version:default}
         environment: ${spring.profiles.active:default}
         node_name: ${HOSTNAME:unknown}
-
----
-# local profile configuration
-spring:
-  config:
-    activate:
-      on-profile: local
-  cloud:
-    aws:
-      # Localstack configuration
-      credentials:
-        access-key: default
-        secret-key: default
-      endpoint: ${SPRING_CLOUD_AWS_SQS_ENDPOINT:http://localhost:4566}
-
-logging:
-  level:
-    root: ${ROOT_LOGGING_LEVEL:info}
-    org.springframework: ${SPRING_LOGGING_LEVEL:info}
-    uk.gov.justice.laa.springboot.microservice: ${APP_LOGGING_LEVEL:info}
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr{faint} %clr([%15.15t]){faint} %clr([%X{traceId:-},%X{spanId:-}]){yellow} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
