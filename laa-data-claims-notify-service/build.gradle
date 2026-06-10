@@ -2,7 +2,7 @@ plugins {
     id 'io.freefair.lombok' version '9.5.0'
     id("com.diffplug.spotless") version "8.6.0"
     id 'uk.gov.laa.springboot.laa-spring-boot-gradle-plugin'
-    id 'io.sentry.jvm.gradle' version '6.8.1'
+    id 'io.sentry.jvm.gradle' version '6.9.0'
     id 'au.com.dius.pact' version '4.7.1'
 }
 
@@ -78,7 +78,7 @@ dependencies {
     implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.2')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
-    implementation 'software.amazon.awssdk:sts:2.44.14'
+    implementation 'software.amazon.awssdk:sts:2.46.1'
 
     // GOV Notify
     implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
