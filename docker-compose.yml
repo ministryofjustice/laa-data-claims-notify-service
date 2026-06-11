@@ -1,8 +1,12 @@
 services:
   notify-service:
+    depends_on:
+      localstack:
+        condition: service_healthy
     container_name: data-claims-notify-service
     build:
       context: .
+      dockerfile: Dockerfile_internal
     ports:
       - "8183:8183"
       - "5083:5083"
@@ -10,3 +14,8 @@ services:
       - SERVER_PORT=8083
       - SPRING_PROFILES_ACTIVE=local
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5083
+      - NOTIFY_API_KEY=${NOTIFY_API_KEY}
+      - SPRING_CLOUD_AWS_SQS_ENDPOINT=http://localstack:4566
+      - AWS_SQS_NOTIFY_QUEUE_NAME=notify-queue
+      - AWS_REGION=us-east-1
+      - CLAIMS_API_URL=http://host.docker.internal:8080

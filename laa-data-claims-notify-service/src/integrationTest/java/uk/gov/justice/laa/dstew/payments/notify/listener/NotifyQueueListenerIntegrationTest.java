@@ -130,10 +130,10 @@ class NotifyQueueListenerIntegrationTest {
     assertThat(captor.getValue().submissionId()).isEqualTo(VALID_UUID);
 
     Map<String, Object> expectedPersonalisation = new LinkedHashMap<>();
-    expectedPersonalisation.put("submission_reference", VALID_UUID.toString());
     expectedPersonalisation.put("office_account", EXPECTED_OFFICE);
     expectedPersonalisation.put("submission_period", EXPECTED_PERIOD);
     expectedPersonalisation.put("area_of_law", AreaOfLaw.LEGAL_HELP.getValue());
+    expectedPersonalisation.put("submission_url", "https://sabc.com/submission/" + VALID_UUID);
 
     verify(notificationClient, timeout(5000))
         .sendEmail(

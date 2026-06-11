@@ -27,7 +27,7 @@ public class NotifyEmailService {
 
     SendEmailResponse response =
         notificationClient.sendEmail(
-            govNotifyProperties.templateId(),
+            govNotifyProperties.successfulSubmissionTemplateId().toString(),
             recipient,
             personalisation,
             String.valueOf(submission.getSubmissionId()));

@@ -68,6 +68,11 @@ env:
       secretKeyRef:
         name: laa-data-claims-notify-service-secrets
         key: NOTIFY_API_KEY
+  - name: SABC_BASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: laa-data-claims-notify-service-secrets
+        key: SABC_BASE_URL
 
 securityContext:
   fsGroup: 1000

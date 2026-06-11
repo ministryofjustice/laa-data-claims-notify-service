@@ -25,11 +25,11 @@ class NotifyEmailServiceTest {
 
   private static final UUID SUBMISSION_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
   private static final String RECIPIENT = "provider.user@example.com";
-  private static final String TEMPLATE_ID = "22222222-2222-2222-2222-222222222222";
-
+  private static final UUID TEMPLATE_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+  private static final String SABC_URL = "http://localhost:8080";
   private final NotificationClient notificationClient = mock(NotificationClient.class);
   private final NotifyPersonalisationMapper personalisationMapper =
-      new NotifyPersonalisationMapper();
+      new NotifyPersonalisationMapper(SABC_URL);
   private final GovNotifyProperties properties = new GovNotifyProperties("test-key", TEMPLATE_ID);
   private final NotifyEmailService service =
       new NotifyEmailService(notificationClient, personalisationMapper, properties);
@@ -45,7 +45,7 @@ class NotifyEmailServiceTest {
             .providerUserId(RECIPIENT);
     SendEmailResponse sendResponse = mock(SendEmailResponse.class);
     when(sendResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-    when(sendResponse.getTemplateId()).thenReturn(UUID.fromString(TEMPLATE_ID));
+    when(sendResponse.getTemplateId()).thenReturn(TEMPLATE_ID);
     when(notificationClient.sendEmail(anyString(), anyString(), anyMap(), anyString()))
         .thenReturn(sendResponse);
 
@@ -53,7 +53,7 @@ class NotifyEmailServiceTest {
 
     verify(notificationClient)
         .sendEmail(
-            eq(TEMPLATE_ID),
+            eq(TEMPLATE_ID.toString()),
             eq(RECIPIENT),
             eq(personalisationMapper.toPersonalisation(submission)),
             eq(SUBMISSION_ID.toString()));
@@ -76,13 +76,13 @@ class NotifyEmailServiceTest {
     SubmissionResponse submission = new SubmissionResponse().submissionId(SUBMISSION_ID);
     SendEmailResponse sendResponse = mock(SendEmailResponse.class);
     when(sendResponse.getNotificationId()).thenReturn(UUID.randomUUID());
-    when(sendResponse.getTemplateId()).thenReturn(UUID.fromString(TEMPLATE_ID));
+    when(sendResponse.getTemplateId()).thenReturn(TEMPLATE_ID);
     when(notificationClient.sendEmail(anyString(), any(), anyMap(), anyString()))
         .thenReturn(sendResponse);
 
     service.sendValidationSuccessEmail(submission);
 
     verify(notificationClient)
-        .sendEmail(eq(TEMPLATE_ID), eq(null), anyMap(), eq(SUBMISSION_ID.toString()));
+        .sendEmail(eq(TEMPLATE_ID.toString()), eq(null), anyMap(), eq(SUBMISSION_ID.toString()));
   }
 }

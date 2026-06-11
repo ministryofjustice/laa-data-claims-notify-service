@@ -6,6 +6,8 @@ spring:
 app:
   gov-notify:
     key: 123
-    template-id: 00000000-0000-0000-0000-000000000000
+    successful-submission-template-id: 00000000-0000-0000-0000-000000000000
   sqs:
     notify-queue-name: notify-queue
+  sabc:
+    url: https://sabc.com
