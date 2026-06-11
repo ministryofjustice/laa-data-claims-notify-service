@@ -15,4 +15,9 @@ ignore:
     - '*':
         reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
         expires: 2026-06-26T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993:
+    - '*':
+        reason: Allocation of Resources Without Limits or Throttling in spring-retry; awaiting upgrade to 2.0.13
+        expires: 2026-06-26T00:00:00.000Z
+
 patch: {}
