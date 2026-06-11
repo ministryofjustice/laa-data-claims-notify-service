@@ -3,17 +3,9 @@ version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 #
 ignore:
-  SNYK-UBUNTU2404-GLIBC-15804597:
+  SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993:
     - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
-        expires: 2026-06-26T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-15804816:
-    - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
-        expires: 2026-06-26T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-15884040:
-    - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
+        reason: Allocation of Resources Without Limits or Throttling in spring-retry; awaiting upgrade to 2.0.13
         expires: 2026-06-26T00:00:00.000Z
   SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993:
     - '*':
