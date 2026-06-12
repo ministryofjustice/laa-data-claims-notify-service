@@ -132,7 +132,7 @@ class NotifyQueueListenerIntegrationTest {
     Map<String, Object> expectedPersonalisation = new LinkedHashMap<>();
     expectedPersonalisation.put("office_account", EXPECTED_OFFICE);
     expectedPersonalisation.put("submission_period", EXPECTED_PERIOD);
-    expectedPersonalisation.put("area_of_law", AreaOfLaw.LEGAL_HELP.getValue());
+    expectedPersonalisation.put("area_of_law", "Legal help");
     expectedPersonalisation.put("submission_url", "https://sabc.com/submission/" + VALID_UUID);
 
     verify(notificationClient, timeout(5000))

@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.dstew.payments.claimsdata.model.AreaOfLaw;
@@ -36,6 +37,6 @@ public class NotifyPersonalisationMapper {
   }
 
   private static String areaOfLawValue(AreaOfLaw areaOfLaw) {
-    return isNull(areaOfLaw) ? "" : areaOfLaw.getValue();
+    return isNull(areaOfLaw) ? "" : StringUtils.capitalize(areaOfLaw.getValue().toLowerCase());
   }
 }
