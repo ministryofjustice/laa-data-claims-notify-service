@@ -32,7 +32,7 @@ class NotifyPersonalisationMapperTest {
         .containsEntry("submission_url", SABC_URL + "/submission/" + SUBMISSION_ID)
         .containsEntry("office_account", "OFFICE-1")
         .containsEntry("submission_period", "JUL-2025")
-        .containsEntry("area_of_law", AreaOfLaw.LEGAL_HELP.getValue());
+        .containsEntry("area_of_law", "Legal help");
   }
 
   @Test
@@ -65,7 +65,7 @@ class NotifyPersonalisationMapperTest {
     Map<String, Object> personalisation = mapper.toPersonalisation(submission);
 
     assertThat(personalisation.get("area_of_law"))
-        .isEqualTo(AreaOfLaw.LEGAL_HELP.getValue())
+        .isEqualTo("Legal help")
         .isNotEqualTo(AreaOfLaw.LEGAL_HELP.name());
   }
 }
