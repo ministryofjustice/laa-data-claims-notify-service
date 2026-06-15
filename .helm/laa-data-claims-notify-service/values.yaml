@@ -82,6 +82,11 @@ securityContext:
 probe:
   enabled: true
 
+sentry:
+  enabled: false
+  environment: env
+  tracesSampleRate: 0.25
+
 resources:
   limits:
     cpu: "1"
