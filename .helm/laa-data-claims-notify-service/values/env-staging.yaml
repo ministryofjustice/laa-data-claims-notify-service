@@ -7,10 +7,7 @@ metrics:
 grafana:
   enabled: true
 
-autoscaling:
-  enabled: false
-
 sentry:
-  enabled: false
+  enabled: true
   environment: staging
   tracesSampleRate: 0.25

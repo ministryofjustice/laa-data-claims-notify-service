@@ -11,6 +11,6 @@ autoscaling:
   enabled: false
 
 sentry:
-  enabled: false
+  enabled: true
   environment: uat
   tracesSampleRate: 0.25

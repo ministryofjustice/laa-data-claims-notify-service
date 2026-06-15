@@ -7,9 +7,6 @@ metrics:
 grafana:
   enabled: true
 
-autoscaling:
-  enabled: false
-
 sentry:
   enabled: false
   environment: uat
