@@ -7,6 +7,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_internal
+    secrets:
+      - github_actor
+      - github_token
     ports:
       - "8183:8183"
       - "5083:5083"
