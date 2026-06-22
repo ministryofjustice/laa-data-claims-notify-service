@@ -35,8 +35,11 @@ app:
     url: ${SABC_BASE_URL:http://localhost:8082}
 
 sentry:
-  dsn: # configure dsn url here
-  environment: # configure environment name here
+  enabled: ${SENTRY_ENABLED:true}
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:}
+  logs:
+    enabled: true
 
 # ECS structured logging
 logging:
