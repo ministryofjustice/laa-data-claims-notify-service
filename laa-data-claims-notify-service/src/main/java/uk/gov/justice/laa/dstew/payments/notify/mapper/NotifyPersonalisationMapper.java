@@ -24,6 +24,7 @@ public class NotifyPersonalisationMapper {
     personalisation.put("office_account", nullSafe(submission.getOfficeAccountNumber()));
     personalisation.put("submission_period", nullSafe(submission.getSubmissionPeriod()));
     personalisation.put("area_of_law", areaOfLawValue(submission.getAreaOfLaw()));
+    personalisation.put("total_claims", nullSafe(submission.getNumberOfClaims()));
     personalisation.put("submission_url", sabcBaseUrl);
     if (!isNull(submission.getSubmissionId())) {
       personalisation.put(
@@ -32,8 +33,8 @@ public class NotifyPersonalisationMapper {
     return personalisation;
   }
 
-  private static String nullSafe(String value) {
-    return isNull(value) ? "" : value;
+  private static String nullSafe(Object value) {
+    return isNull(value) ? "" : String.valueOf(value);
   }
 
   private static String areaOfLawValue(AreaOfLaw areaOfLaw) {
