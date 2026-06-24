@@ -20,15 +20,9 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "06:00"
-      timezone: "Europe/London"
+      interval: "daily"
     cooldown:
       default-days: 7
-    labels:
-      - "dependencies"
-      - "security"
     registries: "*"
     groups:
       gradle-updates:
@@ -40,14 +34,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "06:00"
-      timezone: "Europe/London"
+      interval: "daily"
     cooldown:
       default-days: 7
-    labels:
-      - "dependencies"
     groups:
       github-actions:
         patterns:
