@@ -2,21 +2,27 @@ name: Deploy main
 
 on:
   push:
-    tags:
-      - '*'
-
-permissions:
-  contents: read
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      reltype:
+        type: choice
+        required: true
+        default: "auto"
+        description: "Release type"
+        options: [ "auto", "none", "patch", "minor", "major" ]
 
 jobs:
-  assemble:
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.1.2
+  release:
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@chore/LJCP-27_release_plugin # TODO: pin to SHA on merge
     permissions:
       contents: write
       packages: write
     with:
-      build_command: 'assemble'
-      publish_package: false
+      integration_test_task: "integrationTest"
+      jacoco_coverage_report: 'true'
+      # 'auto' = empty string → shared workflow auto-detects from conventional commits
+      reltype: ${{ inputs.reltype != 'auto' && inputs.reltype || '' }}
       junit_results: 'false'
       junit_report: 'false'
       checkstyle_report: 'false'
@@ -25,7 +31,10 @@ jobs:
       java_version: 25
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-
+      github_app_id: ${{ vars.LAA_JAVA_SERVICE_DEPLOYER_APP_ID }}
+      github_app_private_key: ${{ secrets.LAA_JAVA_SERVICE_DEPLOYER_KEY }}
+      github_app_organisation: 'ministryofjustice'
+  
   #pact-test:
   #  needs: [ assemble ]
   #  uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/pact-and-publish.yml@v2
@@ -53,7 +62,8 @@ jobs:
           echo "This job is disabled and will not run"
 
   ecr-publish-image:
-    needs: [ assemble ]
+    needs: [ release ]
+    if: ${{ needs.release.outputs.published_artifact_version != '' }}
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.1.2
     permissions:
       contents: read
@@ -61,8 +71,9 @@ jobs:
       security-events: write
     with:
       jar_subproject: 'laa-data-claims-notify-service'
-      image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.assemble.outputs.published_artifact_version) }}
+      image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.release.outputs.published_artifact_version) }}
       java_version: 25
+      tag_with_latest: true
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
       ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}

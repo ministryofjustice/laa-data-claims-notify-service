@@ -11,31 +11,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  define-preview-version:
+  compute-snapshot-version:
     runs-on: ubuntu-latest
     outputs:
-      preview_version: ${{ steps.get-preview-version.outputs.preview_version }}
-      snyk_token: ${{ steps.snyk-auth-token.outputs.token }}
+      snapshot_version: ${{ steps.version.outputs.snapshot_version }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Get preview version
-        id: get-preview-version
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Compute version
+        id: compute
+        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/compute-version@chore/LJCP-27_release_plugin # TODO: pin to SHA on merge
+      - name: Compute snapshot version
+        id: version
+        shell: bash
+        env:
+          BUMP_TYPE: ${{ steps.compute.outputs.bump_type }}
+          MAJOR:     ${{ steps.compute.outputs.major }}
+          MINOR:     ${{ steps.compute.outputs.minor }}
+          PATCH:     ${{ steps.compute.outputs.patch }}
         run: |
-          set -euo pipefail
-          commit_hash=$(git rev-parse --short HEAD)
-          version=$(awk -F= '/^version=/{print $2}' gradle.properties)
-          echo "preview_version=${version}-${commit_hash}" >> "$GITHUB_OUTPUT"
-          echo "Preview version: laa-data-claims-notify-service-${version}-${commit_hash}"
+          set -eu
+          BUMP="${BUMP_TYPE:-none}"
+          M="${MAJOR:-0}"; N="${MINOR:-0}"; P="${PATCH:-0}"
+          if [[ "$BUMP" == "none" ]]; then P=$((P+1)); fi
+          HASH=$(git rev-parse --short HEAD)
+          VERSION="${M}.${N}.${P}-${HASH}-SNAPSHOT"
+          echo "snapshot_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Snapshot version: ${VERSION}"
 
   build-and-test:
-    needs: [ define-preview-version ]
+    needs: [ compute-snapshot-version ]
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.1.2
     permissions:
       contents: write
       packages: write
     with:
       publish_package: false
-      override_version: ${{ needs.define-preview-version.outputs.preview_version }}
+      override_version: ${{ needs.compute-snapshot-version.outputs.snapshot_version }}
       integration_test_task: integrationTest
       semgrep_check: 'true'
       java_version: 25
@@ -44,7 +58,7 @@ jobs:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
   #pact-test:
-  #  needs: [ define-preview-version ]
+  #  needs: [ define-snapshot-version ]
   #  uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/pact-and-publish.yml@v2
   #  permissions:
   #    contents: write
