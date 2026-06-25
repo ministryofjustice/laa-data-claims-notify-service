@@ -20,7 +20,6 @@ jobs:
       packages: write
     with:
       integration_test_task: "integrationTest"
-      jacoco_coverage_report: 'true'
       # 'auto' = empty string → shared workflow auto-detects from conventional commits
       release_type: ${{ inputs.release_type != 'auto' && inputs.release_type || '' }}
       junit_results: 'false'
