@@ -18,6 +18,6 @@ ignore:
   SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993:
     - '*':
         reason: Allocation of Resources Without Limits or Throttling in spring-retry; awaiting upgrade to 2.0.13
-        expires: 2026-06-26T00:00:00.000Z
+        expires: 2026-06-30T00:00:00.000Z
 
 patch: {}
