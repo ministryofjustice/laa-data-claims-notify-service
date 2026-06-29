@@ -24,6 +24,7 @@ class NotifyPersonalisationMapperTest {
             .submissionId(SUBMISSION_ID)
             .officeAccountNumber("OFFICE-1")
             .submissionPeriod("JUL-2025")
+            .numberOfClaims(2)
             .areaOfLaw(AreaOfLaw.LEGAL_HELP);
 
     Map<String, Object> personalisation = mapper.toPersonalisation(submission);
@@ -32,7 +33,8 @@ class NotifyPersonalisationMapperTest {
         .containsEntry("submission_url", SABC_URL + "/submission/" + SUBMISSION_ID)
         .containsEntry("office_account", "OFFICE-1")
         .containsEntry("submission_period", "JUL-2025")
-        .containsEntry("area_of_law", "Legal help");
+        .containsEntry("area_of_law", "Legal help")
+        .containsEntry("total_claims", "2");
   }
 
   @Test
@@ -45,6 +47,7 @@ class NotifyPersonalisationMapperTest {
         .containsEntry("submission_url", SABC_URL + "/submission/" + SUBMISSION_ID)
         .containsEntry("office_account", "")
         .containsEntry("submission_period", "")
+        .containsEntry("total_claims", "")
         .containsEntry("area_of_law", "");
   }
 
