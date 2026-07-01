@@ -19,5 +19,13 @@ ignore:
     - '*':
         reason: Allocation of Resources Without Limits or Throttling in spring-retry; awaiting upgrade to 2.0.13
         expires: 2026-06-30T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-16338129:
+    - '*':
+        reason: Waiting for Ubuntu glibc fix
+        expires: 2026-07-31T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-16338217:
+    - '*':
+        reason: Waiting for Ubuntu glibc fix
+        expires: 2026-07-31T00:00:00.000Z
 
 patch: {}
