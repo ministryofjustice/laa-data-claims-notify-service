@@ -19,6 +19,9 @@ processResources {
     }
 }
 
+// Upgrade to fix snyk vulnerabilities in 11.0.22
+ext['tomcat.version'] = '11.0.23'
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
