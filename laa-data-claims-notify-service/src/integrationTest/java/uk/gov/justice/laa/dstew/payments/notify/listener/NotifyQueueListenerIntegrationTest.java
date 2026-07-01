@@ -108,7 +108,8 @@ class NotifyQueueListenerIntegrationTest {
                 .officeAccountNumber(EXPECTED_OFFICE)
                 .submissionPeriod(EXPECTED_PERIOD)
                 .areaOfLaw(AreaOfLaw.LEGAL_HELP)
-                .providerUserId(EXPECTED_RECIPIENT));
+                .providerUserId(EXPECTED_RECIPIENT)
+                .numberOfClaims(2));
     SendEmailResponse sendResponse = mock(SendEmailResponse.class);
     when(notificationClient.sendEmail(anyString(), any(), anyMap(), anyString()))
         .thenReturn(sendResponse);
@@ -133,6 +134,7 @@ class NotifyQueueListenerIntegrationTest {
     expectedPersonalisation.put("office_account", EXPECTED_OFFICE);
     expectedPersonalisation.put("submission_period", EXPECTED_PERIOD);
     expectedPersonalisation.put("area_of_law", "Legal help");
+    expectedPersonalisation.put("total_claims", "2");
     expectedPersonalisation.put("submission_url", "https://sabc.com/submission/" + VALID_UUID);
 
     verify(notificationClient, timeout(5000))
