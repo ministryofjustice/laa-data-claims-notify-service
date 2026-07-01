@@ -21,7 +21,8 @@ processResources {
 
 // Upgrade to fix snyk vulnerabilities in 11.0.22
 ext['tomcat.version'] = '11.0.23'
-
+// https://security.snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993
+ext['spring-retry.version'] = '2.0.13'
 
 test {
     useJUnitPlatform()
@@ -100,6 +101,8 @@ dependencies {
     implementation "io.sentry:sentry-spring-boot-4:$versions.sentry"
 
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    implementation 'org.springframework.retry:spring-retry:2.0.13'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-restclient'
