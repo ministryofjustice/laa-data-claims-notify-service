@@ -16,6 +16,17 @@ on:
       image_tag:
         required: true
         type: string
+    secrets:
+      KUBE_CLUSTER:
+        required: true
+      KUBE_NAMESPACE:
+        required: true
+      KUBE_TOKEN:
+        required: true
+      KUBE_CERT:
+        required: true
+      LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME:
+        required: true
 
 jobs:
   deploy:
