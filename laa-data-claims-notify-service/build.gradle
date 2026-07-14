@@ -23,6 +23,27 @@ processResources {
 ext['tomcat.version'] = '11.0.23'
 // https://security.snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993
 ext['spring-retry.version'] = '2.0.13'
+// Upgrade to fix SNYK-JAVA-ORGAPACHELOGGINGLOG4J-17954276 and related vulnerabilities
+ext['log4j2.version'] = '2.25.5'
+
+configurations.configureEach {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'com.fasterxml.jackson.core' && details.requested.name == 'jackson-annotations') {
+            details.useVersion '2.21'
+        } else if (details.requested.group.startsWith('com.fasterxml.jackson')) {
+            details.useVersion '2.21.5'
+            details.because 'Fixes Improperly Controlled Modification of Dynamically-Determined Object Attributes (SNYK-JAVA-COMFASTERXMLJACKSONCORE-17457695)'
+        }
+        if (details.requested.group == 'org.apache.httpcomponents.core5' && details.requested.name == 'httpcore5-h2') {
+            details.useVersion '5.4.3'
+            details.because 'Fixes Allocation of Resources Without Limits or Throttling (SNYK-JAVA-ORGAPACHEHTTPCOMPONENTSCORE5-17817217)'
+        }
+        if (details.requested.group == 'org.codehaus.plexus' && details.requested.name == 'plexus-utils') {
+            details.useVersion '4.0.3'
+            details.because 'Fixes Directory Traversal (SNYK-JAVA-ORGCODEHAUSPLEXUS-15766699)'
+        }
+    }
+}
 
 test {
     useJUnitPlatform()
