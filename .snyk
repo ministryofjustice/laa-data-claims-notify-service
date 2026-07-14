@@ -3,6 +3,12 @@ version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 #
 ignore:
+  'snyk:lic:maven:net.sf.saxon:Saxon-HE:MPL-2.0':
+    - '*':
+        reason: Build-time tool only (used by checkstyle)
+  'snyk:lic:maven:com.puppycrawl.tools:checkstyle:LGPL-2.1':
+    - '*':
+        reason: Build-time tool only
   SNYK-UBUNTU2404-GLIBC-15804597:
     - '*':
         reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
@@ -15,10 +21,6 @@ ignore:
     - '*':
         reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
         expires: 2026-06-26T00:00:00.000Z
-  SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993:
-    - '*':
-        reason: Allocation of Resources Without Limits or Throttling in spring-retry; awaiting upgrade to 2.0.13
-        expires: 2026-06-30T00:00:00.000Z
   SNYK-UBUNTU2404-GLIBC-16338129:
     - '*':
         reason: Waiting for Ubuntu glibc fix
