@@ -63,7 +63,7 @@ jobs:
   ecr-publish-image:
     needs: [ release ]
     if: ${{ needs.release.outputs.published_artifact_version != '' }}
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.1.2
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.3.0
     permissions:
       contents: read
       id-token: write
