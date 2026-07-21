@@ -6,7 +6,7 @@ services:
     container_name: data-claims-notify-service
     build:
       context: .
-      dockerfile: Dockerfile_internal
+      dockerfile: Dockerfile
     secrets:
       - github_actor
       - github_token
