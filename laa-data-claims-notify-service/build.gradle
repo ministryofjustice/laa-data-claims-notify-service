@@ -1,13 +1,13 @@
 plugins {
     id 'io.freefair.lombok' version '9.5.0'
-    id("com.diffplug.spotless") version "8.7.0"
+    id("com.diffplug.spotless") version "8.8.0"
     id 'uk.gov.laa.springboot.laa-spring-boot-gradle-plugin'
-    id 'io.sentry.jvm.gradle' version '6.12.0'
+    id 'io.sentry.jvm.gradle' version '6.15.0'
     id 'au.com.dius.pact' version '4.7.3'
 }
 
 def versions = [
-    sentry        : '8.44.1'
+    sentry        : '8.49.0'
 ]
 
 // Replaces application.yml @version@  with version from gradle.properties
@@ -31,11 +31,11 @@ dependencyManagement {
     dependencies {
         // === INSERT YOUR OVERRIDES HERE ===
         // Force jackson-core version to fix Snyk vulnerability
-        dependency "com.fasterxml.jackson.core:jackson-core:2.21.5"
-        dependency "com.fasterxml.jackson.core:jackson-databind:2.21.5"
+        dependency "com.fasterxml.jackson.core:jackson-core:2.22.1"
+        dependency "com.fasterxml.jackson.core:jackson-databind:2.22.1"
         // Force tools.jackson version to fix Snyk vulnerability
-        dependency "tools.jackson.core:jackson-core:3.1.5"
-        dependency "tools.jackson.core:jackson-databind:3.1.5"
+        dependency "tools.jackson.core:jackson-core:3.2.1"
+        dependency "tools.jackson.core:jackson-databind:3.2.1"
         // Force plexus-utils version to fix Snyk vulnerability
         dependency "org.codehaus.plexus:plexus-utils:4.0.3"
         // Force httpcore5-h2 version to fix Snyk vulnerability
@@ -112,10 +112,10 @@ dependencies {
     implementation platform('io.awspring.cloud:spring-cloud-aws:4.0.2')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
-    implementation 'software.amazon.awssdk:sts:2.46.17'
+    implementation 'software.amazon.awssdk:sts:2.48.4'
 
     // GOV Notify
-    implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
+    implementation 'uk.gov.service.notify:notifications-java-client:6.0.1-RELEASE'
 
     // Required for tracing information
     implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
@@ -141,7 +141,7 @@ dependencies {
     testImplementation 'org.testcontainers:mockserver:1.21.4'
     testImplementation 'org.testcontainers:localstack:1.21.4'
     testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
-    testImplementation 'org.mock-server:mockserver-client-java:7.2.0'
+    testImplementation 'org.mock-server:mockserver-client-java:7.4.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
