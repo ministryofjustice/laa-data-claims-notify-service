@@ -20,7 +20,7 @@ processResources {
 }
 
 // Upgrade to fix Snyk vulnerabilities in Netty
-ext['netty.version'] = '4.2.16.Final'
+ext['netty.version'] = '4.2.17.Final'
 // Upgrade to fix snyk vulnerabilities in 11.0.22
 ext['tomcat.version'] = '11.0.23'
 // https://security.snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORKRETRY-17260993
@@ -33,13 +33,13 @@ dependencyManagement {
     dependencies {
         // === INSERT YOUR OVERRIDES HERE ===
         // Force jackson-core version to fix Snyk vulnerability
-        dependency "com.fasterxml.jackson.core:jackson-core:2.22.2"
-        dependency "com.fasterxml.jackson.core:jackson-databind:2.22.2"
+        dependency "com.fasterxml.jackson.core:jackson-core:2.22.1"
+        dependency "com.fasterxml.jackson.core:jackson-databind:2.22.1"
         // Force tools.jackson version to fix Snyk vulnerability
-        dependency "tools.jackson.core:jackson-core:3.2.2"
-        dependency "tools.jackson.core:jackson-databind:3.2.2"
+        dependency "tools.jackson.core:jackson-core:3.2.1"
+        dependency "tools.jackson.core:jackson-databind:3.2.1"
         // Force plexus-utils version to fix Snyk vulnerability
-        dependency "org.codehaus.plexus:plexus-utils:4.1.0"
+        dependency "org.codehaus.plexus:plexus-utils:4.0.3"
         // Force httpcore5-h2 version to fix Snyk vulnerability
         dependency 'org.apache.httpcomponents.core5:httpcore5-h2:5.4.3'
     }
