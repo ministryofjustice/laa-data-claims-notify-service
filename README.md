@@ -188,46 +188,6 @@ GitHub Actions pipelines are defined in `.github/workflows/`:
 Semgrep static analysis is run as part of the build and test workflows. Deployments use Helm with a
 5-minute rollout timeout per environment.
 
-## Local Snyk container scanning
-
-You can run the same style of container scan locally with the Snyk CLI against a locally built OCI
-image.
-
-### Prerequisites
-
-- Docker
-- [Snyk CLI](https://docs.snyk.io/developer-tools/snyk-cli)
-- Snyk authentication via either `SNYK_TOKEN` or `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET`
-
-### Run the scan
-
-```bash
-./scripts/snyk-container-scan.sh
-```
-
-This script:
-
-1. Builds a local image with `:laa-data-claims-notify-service:bootBuildImage`
-2. Reuses the repository `.snyk` policy file
-3. Runs `snyk container test` with a default severity threshold of `high`
-
-Useful variants:
-
-```bash
-# Scan an already-built image
-./scripts/snyk-container-scan.sh --skip-build
-
-# Change the image name or severity threshold
-./scripts/snyk-container-scan.sh --image-name laa-data-claims-notify-service:test --severity-threshold critical
-
-# Pass extra Snyk CLI flags through after --
-./scripts/snyk-container-scan.sh -- --json
-```
-
-If Snyk returns an auth-related `SNYK-0003`, your local CLI session has usually expired. Re-run
-`snyk auth`, or export fresh `SNYK_TOKEN` or `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET` values
-before running the script again.
-
 ## Code Style and Formatting
 
 [Spotless](https://github.com/diffplug/spotless) is used to enforce consistent Java formatting. It
