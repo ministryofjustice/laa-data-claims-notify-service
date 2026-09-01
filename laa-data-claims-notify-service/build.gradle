@@ -24,6 +24,8 @@ ext['micrometer.version'] = '1.17.1'
 dependencyManagement {
     dependencies {
         // === INSERT YOUR OVERRIDES HERE ===
+        dependency "com.fasterxml.jackson.core:jackson-databind:2.22.2"
+        dependency "tools.jackson.core:jackson-databind:3.2.2"
     }
 }
 
