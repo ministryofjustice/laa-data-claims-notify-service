@@ -32,7 +32,10 @@ dependencyManagement {
 
 configurations.configureEach {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-
+        if (details.requested.group.startsWith('tools.jackson')) {
+            details.useVersion '3.1.6'
+            details.because 'Fixes Incorrect Authorization (SNYK-JAVA-TOOLSJACKSONCORE-17972609)'
+        }
     }
 }
 
