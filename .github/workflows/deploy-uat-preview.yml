@@ -88,8 +88,7 @@ jobs:
       jar_subproject: 'laa-data-claims-notify-service'
       image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.build-and-test.outputs.published_artifact_version) }}
       java_version: 25
-      image_scan: 'true'
-      image_scan_severity: 'high'
+      image_scan: 'false'
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
       ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}
@@ -97,6 +96,24 @@ jobs:
       ecr_role_to_assume: ${{ secrets.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME }}
       snyk_client_id: ${{ secrets.SNYK_CLIENT_ID }}
       snyk_client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+      
+  snyk-image-scan:
+    needs: [ ecr-publish-image ]
+    uses: ./.github/workflows/snyk-docker-scan.yml
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
+    with:
+      branch: ${{ github.sha }}
+      image_tag: ${{ needs.ecr-publish-image.outputs.published_image_version }}
+      aws_region: ${{ vars.ECR_REGION }}
+      ecr_repository: ${{ vars.ECR_REPOSITORY }}
+      image_scan_threshold: 'high'
+    secrets:
+      ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+      SNYK_CLIENT_ID: ${{ secrets.SNYK_CLIENT_ID }}
+      SNYK_CLIENT_SECRET: ${{ secrets.SNYK_CLIENT_SECRET }}
 
   deploy-uat-preview:
     needs:
