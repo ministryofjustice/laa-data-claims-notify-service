@@ -6,7 +6,7 @@ plugins {
 }
 
 def versions = [
-    sentry        : '8.56.0'
+    sentry        : '8.57.0'
 ]
 apply plugin: 'uk.gov.justice.service.laa.laa-spring-boot-gradle-plugin'
 
@@ -102,7 +102,7 @@ dependencies {
     implementation 'software.amazon.awssdk:sts'
 
     // GOV Notify
-    implementation 'uk.gov.service.notify:notifications-java-client:6.2.0-RELEASE'
+    implementation 'uk.gov.service.notify:notifications-java-client:6.2.1-RELEASE'
 
     // Required for tracing information
     implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
@@ -128,7 +128,7 @@ dependencies {
     testImplementation 'org.testcontainers:mockserver:1.21.4'
     testImplementation 'org.testcontainers:localstack:1.21.4'
     testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
-    testImplementation 'org.mock-server:mockserver-client-java:7.6.0'
+    testImplementation 'org.mock-server:mockserver-client-java:8.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
