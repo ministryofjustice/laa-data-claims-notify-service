@@ -22,7 +22,7 @@ jobs:
           fetch-tags: true
       - name: Compute version
         id: compute
-        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/compute-version@a5977e695ff627aab738dd22a1e4322e78beada6 # v2.4.0
+        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/compute-version@035ee98ca0047659f865532ea6234abd69529ee8 # v2.5.0
       - name: Compute snapshot version
         id: version
         shell: bash
@@ -43,7 +43,7 @@ jobs:
 
   build-and-test:
     needs: [ compute-snapshot-version ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.4.0
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.5.0
     permissions:
       contents: write
       packages: write
@@ -79,7 +79,7 @@ jobs:
 
   ecr-publish-image:
     needs: [ build-and-test ]
-    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.4.0
+    uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/ecr-publish-image.yml@v2.5.0
     permissions:
       contents: read
       id-token: write
@@ -88,7 +88,7 @@ jobs:
       jar_subproject: 'laa-data-claims-notify-service'
       image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.build-and-test.outputs.published_artifact_version) }}
       java_version: 25
-      image_scan: 'true'
+      image_scan: 'false'
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
       ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}
@@ -96,6 +96,24 @@ jobs:
       ecr_role_to_assume: ${{ secrets.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME }}
       snyk_client_id: ${{ secrets.SNYK_CLIENT_ID }}
       snyk_client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+      
+  snyk-image-scan:
+    needs: [ ecr-publish-image ]
+    uses: ./.github/workflows/snyk-docker-scan.yml
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
+    with:
+      branch: ${{ github.sha }}
+      image_tag: ${{ needs.ecr-publish-image.outputs.published_image_version }}
+      aws_region: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REGION }}
+      ecr_repository: ${{ vars.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_REPOSITORY }}
+      image_scan_threshold: 'high'
+    secrets:
+      ECR_ROLE_TO_ASSUME: ${{ secrets.LAA_DATA_CLAIMS_NOTIFY_SERVICE_ECR_ROLE_TO_ASSUME }}
+      SNYK_CLIENT_ID: ${{ secrets.SNYK_CLIENT_ID }}
+      SNYK_CLIENT_SECRET: ${{ secrets.SNYK_CLIENT_SECRET }}
 
   deploy-uat-preview:
     needs:
