@@ -29,5 +29,17 @@ ignore:
     - '*':
         reason: Waiting for Ubuntu glibc fix
         expires: 2026-07-31T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-19437583:
+    - '*':
+        reason: Base-image glibc CVE (CVE-2026-18374); no fixed package available yet
+        expires: 2026-10-31T00:00:00.000Z
+  SNYK-UBUNTU2404-GLIBC-19785393:
+    - '*':
+        reason: Base-image glibc CVE (CVE-2026-89092); no fixed package available yet
+        expires: 2026-10-31T00:00:00.000Z
+  SNYK-UBUNTU2404-ZLIB-19530295:
+    - '*':
+        reason: Base-image zlib1g out-of-bounds write; no fixed package available yet
+        expires: 2026-10-31T00:00:00.000Z
 
 patch: {}
