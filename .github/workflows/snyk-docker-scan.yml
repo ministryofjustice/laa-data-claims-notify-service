@@ -68,7 +68,7 @@ jobs:
       - name: Pull Docker image from ECR
         run: |
           docker pull "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
-          docker tag "$REGISTRY/$REPOSITORY:$IMAGE_TAG" ministryofjustice/submit-a-bulk-claim:scan
+          docker tag "$REGISTRY/$REPOSITORY:$IMAGE_TAG" ministryofjustice/laa-data-claims-notify-service:scan
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ inputs.ecr_repository }}
@@ -88,7 +88,7 @@ jobs:
           SNYK_OAUTH_TOKEN: ${{ steps.auth.outputs.token }}
         uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04
         with:
-          image: ministryofjustice/submit-a-bulk-claim:scan
+          image: ministryofjustice/laa-data-claims-notify-service:scan
           args: --file=Dockerfile --severity-threshold=${{ inputs.image_scan_threshold }} --fail-on=${{ inputs.image_scan_fails_on }} --policy-path=.snyk
           command: ${{ inputs.branch == 'main' && 'monitor' || 'test' }}
 

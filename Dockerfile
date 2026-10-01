@@ -18,4 +18,4 @@ USER 1001
 EXPOSE 8183
 
 # Run the JAR file
-CMD java -jar app.jar
+CMD ["java", "-jar", "app.jar"]

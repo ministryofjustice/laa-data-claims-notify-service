@@ -9,25 +9,5 @@ ignore:
   'snyk:lic:maven:com.puppycrawl.tools:checkstyle:LGPL-2.1':
     - '*':
         reason: Build-time tool only
-  SNYK-UBUNTU2404-GLIBC-15804597:
-    - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
-        expires: 2026-06-26T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-15804816:
-    - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
-        expires: 2026-06-26T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-15884040:
-    - '*':
-        reason: Base-image glibc CVE in Paketo Buildpacks Tiny Noble; awaiting upstream stack update
-        expires: 2026-06-26T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-16338129:
-    - '*':
-        reason: Waiting for Ubuntu glibc fix
-        expires: 2026-07-31T00:00:00.000Z
-  SNYK-UBUNTU2404-GLIBC-16338217:
-    - '*':
-        reason: Waiting for Ubuntu glibc fix
-        expires: 2026-07-31T00:00:00.000Z
 
 patch: {}
