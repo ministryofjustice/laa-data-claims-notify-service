@@ -1,0 +1,35 @@
+name: Delete UAT preview deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number of the preview release to remove"
+        required: true
+        type: number
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup-uat:
+    runs-on: ubuntu-latest
+    environment: uat
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Cleanup uat
+        uses: ./.github/actions/cleanup_branch
+        with:
+          pr-number: ${{ github.event.pull_request.number || inputs.pr_number }}
+          kube-cert: ${{ secrets.KUBE_CERT }}
+          kube-token: ${{ secrets.KUBE_TOKEN }}
+          kube-cluster: ${{ secrets.KUBE_CLUSTER }}
+          kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
