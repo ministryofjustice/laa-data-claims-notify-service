@@ -32,6 +32,7 @@ jobs:
           import json
           import os
           import subprocess
+          import sys
           from datetime import datetime, timedelta, timezone
 
           MAX_AGE_DAYS = 7
@@ -51,14 +52,20 @@ jobs:
 
           print(f"\n=== Processing {len(targets)} ephemeral release(s) ===")
 
+          failed = []
+
           for release in targets:
               name = release["name"]
-              updated = datetime.strptime(release["updated"].split(".")[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+              updated = datetime.strptime(release["updated"][:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
               if updated < cutoff:
                   print(f"STALE: {name} (last updated: {updated.strftime('%Y-%m-%d')}) - removing")
-                  subprocess.run(["helm", "uninstall", name, "-n", namespace], check=True)
+                  if subprocess.run(["helm", "uninstall", name, "-n", namespace]).returncode != 0:
+                      failed.append(name)
               else:
                   print(f"ACTIVE: {name} (last updated: {updated.strftime('%Y-%m-%d')}) - keeping")
+
+          if failed:
+              sys.exit(f"\nFailed to remove: {', '.join(failed)}")
 
           print("\n=== Cleanup complete ===")
