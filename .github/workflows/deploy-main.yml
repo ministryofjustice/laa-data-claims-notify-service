@@ -69,7 +69,7 @@ jobs:
       id-token: write
       security-events: write
     with:
-      jar_subproject: 'laa-data-claims-notify-service'
+      dockerfile_path: 'Dockerfile'
       image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.release.outputs.published_artifact_version) }}
       java_version: 25
       tag_with_latest: true
