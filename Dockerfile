@@ -1,5 +1,5 @@
 # Specify java runtime base image
-FROM amazoncorretto:25.0.4-alpine3.24
+FROM amazoncorretto:27.0.0-alpine3.24
 
 # Set up working directory in the container
 RUN mkdir -p /opt/laa-data-claims-notify-service/
