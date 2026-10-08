@@ -1,12 +1,12 @@
 plugins {
-    id 'io.freefair.lombok' version '9.5.0'
-    id("com.diffplug.spotless") version "8.10.2"
-    id 'io.sentry.jvm.gradle' version '6.22.0'
+    id 'io.freefair.lombok' version '9.8.0'
+    id("com.diffplug.spotless") version "8.10.3"
+    id 'io.sentry.jvm.gradle' version '6.23.0'
     id 'au.com.dius.pact' version '4.7.5'
 }
 
 def versions = [
-    sentry        : '8.56.0'
+    sentry        : '8.59.0'
 ]
 apply plugin: 'uk.gov.justice.service.laa.laa-spring-boot-gradle-plugin'
 
@@ -97,19 +97,19 @@ dependencies {
     implementation 'uk.gov.justice.laa.datastewardship.payments:data-claims-api-models:1.0.42'
 
     // Listening to SQS queue
-    implementation platform('io.awspring.cloud:spring-cloud-aws:4.1.1')
+    implementation platform('io.awspring.cloud:spring-cloud-aws:4.2.0')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
     implementation 'software.amazon.awssdk:sts'
 
     // GOV Notify
-    implementation 'uk.gov.service.notify:notifications-java-client:6.2.0-RELEASE'
+    implementation 'uk.gov.service.notify:notifications-java-client:6.2.1-RELEASE'
 
     // Required for tracing information
     implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
-    implementation 'org.apache.commons:commons-lang3:3.20.0'
+    implementation 'org.apache.commons:commons-lang3:3.21.0'
     implementation 'org.mapstruct:mapstruct:1.6.3'
 
     // Sentry
@@ -129,7 +129,7 @@ dependencies {
     testImplementation 'org.testcontainers:mockserver:1.21.4'
     testImplementation 'org.testcontainers:localstack:1.21.4'
     testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
-    testImplementation 'org.mock-server:mockserver-client-java:7.6.0'
+    testImplementation 'org.mock-server:mockserver-client-java:8.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
