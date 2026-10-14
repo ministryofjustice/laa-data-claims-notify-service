@@ -11,45 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  compute-snapshot-version:
-    runs-on: ubuntu-latest
-    outputs:
-      snapshot_version: ${{ steps.version.outputs.snapshot_version }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Compute version
-        id: compute
-        uses: ministryofjustice/laa-ccms-common-workflows/.github/actions/compute-version@035ee98ca0047659f865532ea6234abd69529ee8 # v2.5.0
-      - name: Compute snapshot version
-        id: version
-        shell: bash
-        env:
-          BUMP_TYPE: ${{ steps.compute.outputs.bump_type }}
-          MAJOR:     ${{ steps.compute.outputs.major }}
-          MINOR:     ${{ steps.compute.outputs.minor }}
-          PATCH:     ${{ steps.compute.outputs.patch }}
-        run: |
-          set -eu
-          BUMP="${BUMP_TYPE:-none}"
-          M="${MAJOR:-0}"; N="${MINOR:-0}"; P="${PATCH:-0}"
-          if [[ "$BUMP" == "none" ]]; then P=$((P+1)); fi
-          HASH=$(git rev-parse --short HEAD)
-          VERSION="${M}.${N}.${P}-${HASH}-SNAPSHOT"
-          echo "snapshot_version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Snapshot version: ${VERSION}"
-
   build-and-test:
-    needs: [ compute-snapshot-version ]
     uses: ministryofjustice/laa-ccms-common-workflows/.github/workflows/gradle-build-and-publish.yml@v2.5.0
     permissions:
       contents: write
       packages: write
     with:
       publish_package: false
-      override_version: ${{ needs.compute-snapshot-version.outputs.snapshot_version }}
       integration_test_task: integrationTest
       semgrep_check: 'true'
       java_version: 25
@@ -86,7 +54,7 @@ jobs:
       security-events: write
     with:
       dockerfile_path: 'Dockerfile'
-      image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, needs.build-and-test.outputs.published_artifact_version) }}
+      image_version: ${{ format('{0}-{1}', vars.IMAGE_PREFIX, github.sha) }}
       java_version: 25
       image_scan: 'false'
     secrets:
