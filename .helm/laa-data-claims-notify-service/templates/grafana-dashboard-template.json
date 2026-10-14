@@ -714,7 +714,7 @@
   "schemaVersion": 40,
   "tags": [
     "LAA",
-    "DSTEW",
+    "CWC",
     "Claims",
     "{{ .Chart.Name }}",
     "{{ .Release.Namespace }}",
