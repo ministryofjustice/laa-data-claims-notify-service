@@ -13,8 +13,8 @@ pluginManagement {
     }
 
     plugins {
-        id 'org.openapi.generator' version '7.25.0'
-        id 'io.freefair.lombok' version '9.5.0'
+        id 'org.openapi.generator' version '7.26.0'
+        id 'io.freefair.lombok' version '9.8.0'
     }
 }
 
