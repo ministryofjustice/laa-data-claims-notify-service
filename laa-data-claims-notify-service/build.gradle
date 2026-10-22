@@ -1,12 +1,12 @@
 plugins {
-    id 'io.freefair.lombok' version '9.8.0'
+    id 'io.freefair.lombok' version '9.8.2'
     id("com.diffplug.spotless") version "8.10.4"
     id 'io.sentry.jvm.gradle' version '6.23.0'
     id 'au.com.dius.pact' version '4.7.5'
 }
 
 def versions = [
-    sentry        : '8.60.0'
+    sentry        : '8.61.0'
 ]
 apply plugin: 'uk.gov.justice.service.laa.laa-spring-boot-gradle-plugin'
 
