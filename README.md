@@ -14,6 +14,7 @@ SNS, and this service handles delivery.
 
 **Benefits of this pattern:**
 
+
 - Centralised email delivery and template management
 - Upstream services have no dependency on GOV.UK Notify directly
 - New notification channels (e.g. SMS, letters) can be added here without changes to upstream
